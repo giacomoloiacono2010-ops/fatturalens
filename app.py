@@ -601,34 +601,53 @@ def stripe_webhook():
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        customer_email = session.get('customer_email', '').strip().lower()
+        customer_email = session.get('customer_email', '').strip().lower() or \
+            session.get('customer_details', {}).get('email', '').strip().lower()
         line_items = None
         try:
             line_items = stripe.checkout.Session.list_line_items(session['id'], limit=1)
         except Exception:
             pass
 
+        price_id = None
         product_id = None
         if line_items and line_items['data']:
             price = line_items['data'][0].get('price', {})
+            price_id = price.get('id')
             product_id = price.get('product')
 
-        if product_id and customer_email:
+        if price_id and customer_email:
             conn = get_db()
-            product_map = {
-                'prod_base': ('base', 100),
-                'prod_pro': ('pro', 99999),
+            # Price ID -> plan mapping
+            PRICE_MAP = {
+                'price_1TddtjRqsyVYsJ482JUsz8VH': ('base', 100),
+                'price_1TddtkRqsyVYsJ48R94zWXzG': ('pro', 99999),
             }
-            if product_id in product_map:
-                piano, limite = product_map[product_id]
+            if price_id in PRICE_MAP:
+                piano, limite = PRICE_MAP[price_id]
                 conn.execute(
                     "UPDATE utenti SET piano = ?, limite_mensile = ?, stripe_customer_id = ? WHERE email = ?",
                     (piano, limite, session.get('customer', ''), customer_email)
                 )
+                conn.commit()
+                conn.close()
+                logger.info(f"STRIPE|{customer_email}|upgraded_to_{piano}")
+            elif price_id == 'price_1TfeMBRqsyVYsJ48lWFtLf9M':
+                # Pay-per-use: add 1 to monthly limit
+                conn.execute(
+                    "UPDATE utenti SET limite_mensile = limite_mensile + 1, stripe_customer_id = ? WHERE email = ?",
+                    (session.get('customer', ''), customer_email)
+                )
+                conn.commit()
+                conn.close()
+                logger.info(f"STRIPE|{customer_email}|pay_per_use_+1")
             else:
+                # Fallback: check product name
+                conn.close()
                 try:
                     prod = stripe.Product.retrieve(product_id)
                     prod_name = prod.get('name', '').lower()
+                    conn = get_db()
                     if 'pro' in prod_name:
                         conn.execute(
                             "UPDATE utenti SET piano = 'pro', limite_mensile = 99999, stripe_customer_id = ? WHERE email = ?",
@@ -639,14 +658,18 @@ def stripe_webhook():
                             "UPDATE utenti SET piano = 'base', limite_mensile = 100, stripe_customer_id = ? WHERE email = ?",
                             (session.get('customer', ''), customer_email)
                         )
+                    elif 'singola' in prod_name:
+                        conn.execute(
+                            "UPDATE utenti SET limite_mensile = limite_mensile + 1, stripe_customer_id = ? WHERE email = ?",
+                            (session.get('customer', ''), customer_email)
+                        )
+                    conn.commit()
+                    conn.close()
+                    logger.info(f"STRIPE|{customer_email}|fallback_upgraded")
                 except Exception:
                     pass
-            conn.commit()
-            upgraded_plan = product_map.get(product_id, ('unknown', 0))[0]
-            conn.close()
-            logger.info(f"STRIPE|{customer_email}|upgraded_to_{upgraded_plan}")
 
-    return jsonify({'received': True}), 200
+        return jsonify({'received': True}), 200
 
 @app.route('/health', methods=['GET'])
 def health():
