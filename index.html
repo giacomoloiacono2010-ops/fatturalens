@@ -188,6 +188,38 @@
       transform: translateY(-4px);
       box-shadow: 0 12px 32px rgba(0,0,0,0.10);
     }
+
+    /* MODAL */
+    .modal-overlay {
+      position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.5);
+      display:none; align-items:center; justify-content:center;
+      padding:20px;
+    }
+    .modal-card {
+      background:#fff; max-width:420px; width:100%; border-radius:16px;
+      padding:40px; position:relative; box-shadow:0 24px 48px rgba(0,0,0,0.2);
+    }
+    .modal-close {
+      position:absolute; top:16px; right:16px; background:none; border:none;
+      font-size:24px; color:#94a3b8; cursor:pointer; line-height:1;
+      width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+      border-radius:8px; transition:background 0.15s, color 0.15s;
+    }
+    .modal-close:hover { background:#f1f5f9; color:#0f172a; }
+    .modal-logo { text-align:center; font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; font-weight:800; color:#0f172a; margin-bottom:8px; }
+    .modal-title { text-align:center; font-size:24px; font-weight:700; color:#0f172a; margin-bottom:6px; }
+    .modal-sub { text-align:center; font-size:14px; color:#64748b; margin-bottom:28px; }
+    .modal-input { width:100%; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:15px; font-family:'Inter',sans-serif; outline:none; transition:border-color 0.15s; box-sizing:border-box; }
+    .modal-input:focus { border-color:#6366f1; }
+    .modal-input-otp { text-align:center; font-size:24px; letter-spacing:8px; padding:14px; }
+    .modal-btn { width:100%; padding:14px; background:#6366f1; color:#fff; border:none; border-radius:8px; font-size:15px; font-weight:600; font-family:'Inter',sans-serif; cursor:pointer; transition:background 0.15s; margin-top:12px; }
+    .modal-btn:hover { background:#4f46e5; }
+    .modal-btn:disabled { opacity:0.7; cursor:not-allowed; }
+    .modal-otp-section { display:none; margin-top:20px; padding-top:20px; border-top:1px solid #f1f5f9; }
+    .modal-otp-label { font-size:14px; color:#64748b; margin-bottom:12px; }
+    .modal-reinvia { color:#6366f1; font-size:13px; cursor:pointer; text-align:center; display:block; margin-top:12px; background:none; border:none; font-family:'Inter',sans-serif; }
+    .modal-reinvia:hover { text-decoration:underline; }
+    .modal-error { display:none; background:#fef2f2; border:1px solid #fecaca; border-radius:8px; padding:10px 14px; font-size:13px; color:#dc2626; margin-top:16px; text-align:center; }
   </style>
 </head>
 <body>
@@ -292,7 +324,7 @@
       <div class="steps-row cards-grid">
         <div class="step-card fade-in">
           <div class="step-number">01</div>
-          <div class="step-title">Carica il PDF</div>
+          <div class="step-title">Carica la fattura</div>
           <div class="step-text">Trascini il file nel browser o lo selezioni dal tuo computer. Formati supportati: PDF, JPEG, PNG.</div>
         </div>
         <div class="step-arrow">
@@ -441,7 +473,7 @@
               2 utenti
             </div>
           </div>
-          <a href="/app" class="btn-pricing btn-pricing-primary">Scegli Base</a>
+          <a href="javascript:void(0)" class="btn-pricing btn-pricing-primary" data-piano="base">Scegli Base</a>
         </div>
 
         <!-- PRO -->
@@ -459,14 +491,14 @@
             </div>
             <div class="feature-item">
               <span class="feature-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L3.5 7L8 2.5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-              Priorità elaborazione
+              Priorit&agrave; elaborazione
             </div>
             <div class="feature-item">
               <span class="feature-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L3.5 7L8 2.5" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               Supporto telefonico
             </div>
           </div>
-          <a href="/app" class="btn-pricing btn-pricing-dark">Scegli Pro</a>
+          <a href="javascript:void(0)" class="btn-pricing btn-pricing-dark" data-piano="pro">Scegli Pro</a>
         </div>
 
       </div>
@@ -526,7 +558,7 @@
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
         <div class="faq-question">Funziona con qualsiasi tipo di fattura? <span class="faq-icon">+</span></div>
-        <div class="faq-answer"><p>FatturaLens funziona con tutti i PDF con testo selezionabile. Le scansioni fotografiche non sono supportate. Il 95% delle fatture digitali italiane &egrave; compatibile.</p></div>
+        <div class="faq-answer"><p>FatturaLens funziona con tutti i PDF con testo selezionabile e con foto di fatture (JPG, PNG). Il 95% delle fatture digitali italiane &egrave; compatibile.</p></div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
         <div class="faq-question">I miei dati sono al sicuro? <span class="faq-icon">+</span></div>
@@ -601,19 +633,183 @@
     </div>
   </footer>
 
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+      <div class="modal-logo">FatturaLens</div>
+      <div class="modal-title">Entra o registrati</div>
+      <div class="modal-sub">Inserisci la tua email. Ti mandiamo un codice di accesso.</div>
+
+      <input class="modal-input" id="modal-email" type="email" placeholder="nome@studio.it" autocomplete="email">
+      <button class="modal-btn" id="modal-btn-continua">Continua</button>
+
+      <div class="modal-otp-section" id="otp-section">
+        <div class="modal-otp-label">Inserisci il codice a 6 cifre che hai ricevuto via email</div>
+        <input class="modal-input modal-input-otp" id="modal-otp" type="text" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+        <button class="modal-btn" id="modal-btn-otp">Accedi</button>
+        <button class="modal-reinvia" id="modal-reinvia">Non hai ricevuto il codice? Reinvia</button>
+      </div>
+
+      <div class="modal-error" id="modal-error"></div>
+    </div>
+  </div>
+
   <script>
-    // AUTH LOGIC
-    (function() {
-      var token = localStorage.getItem('fl_token');
-      if (token) {
-        var headerRight = document.querySelector('.header-right');
-        if (headerRight) {
-          headerRight.innerHTML = '<a href="/dashboard?token=' + token + '" style="background:#6366f1;color:#fff;padding:10px 20px;border-radius:8px;font-weight:600;font-size:14px;text-decoration:none;">Dashboard \u2192</a>';
-        }
-        document.querySelectorAll('.btn-hero-primary, .btn-primary').forEach(function(btn) {
-          btn.textContent = 'Vai alla Dashboard \u2192';
-          btn.href = '/dashboard?token=' + token;
+    // Modal login/registrazione
+    function openLoginModal() {
+      document.getElementById('login-modal').style.display = 'flex';
+      document.getElementById('modal-email').focus();
+    }
+    function closeLoginModal() {
+      document.getElementById('login-modal').style.display = 'none';
+      document.getElementById('otp-section').style.display = 'none';
+      document.getElementById('modal-error').style.display = 'none';
+      document.getElementById('modal-email').value = '';
+      document.getElementById('modal-otp').value = '';
+      pendingPiano = null;
+    }
+
+    var pendingPiano = null;
+
+    async function startCheckout(piano, token) {
+      try {
+        var res = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: token, piano: piano })
         });
+        var data = await res.json();
+        if (data.success && data.url) {
+          window.location.href = data.url;
+        } else {
+          showModalError(data.error || 'Errore durante il checkout.');
+        }
+      } catch(e) {
+        showModalError('Errore di connessione. Riprova.');
+      }
+    }
+
+    // Bottoni prezzi: Scegli Base / Scegli Pro
+    document.querySelectorAll('[data-piano]').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        e.preventDefault();
+        var piano = this.getAttribute('data-piano');
+        var token = localStorage.getItem('fl_token');
+        if (token) {
+          startCheckout(piano, token);
+        } else {
+          pendingPiano = piano;
+          openLoginModal();
+        }
+      });
+    });
+
+    // Collega bottoni header e hero al modal
+    document.querySelectorAll('a[href="/app"]').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        var token = localStorage.getItem('fl_token');
+        if (token) { window.location.href = '/app'; return; }
+        e.preventDefault();
+        openLoginModal();
+      });
+    });
+
+    // Step 1: invia OTP
+    document.getElementById('modal-btn-continua').addEventListener('click', async function() {
+      var email = document.getElementById('modal-email').value.trim();
+      if (!email || !email.includes('@')) {
+        showModalError('Inserisci un indirizzo email valido.');
+        return;
+      }
+      this.textContent = 'Invio in corso...';
+      this.disabled = true;
+      try {
+        var res = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        var data = await res.json();
+        if (data.success) {
+          document.getElementById('otp-section').style.display = 'block';
+          document.getElementById('modal-error').style.display = 'none';
+          this.textContent = 'Codice inviato \u2713';
+        } else {
+          showModalError(data.error || 'Errore durante l\'invio. Riprova.');
+          this.textContent = 'Continua';
+          this.disabled = false;
+        }
+      } catch(e) {
+        showModalError('Errore di connessione. Riprova.');
+        this.textContent = 'Continua';
+        this.disabled = false;
+      }
+    });
+
+    // Step 2: verifica OTP
+    document.getElementById('modal-btn-otp').addEventListener('click', async function() {
+      var email = document.getElementById('modal-email').value.trim();
+      var otp = document.getElementById('modal-otp').value.trim();
+      if (!otp || otp.length < 6) { showModalError('Inserisci il codice a 6 cifre.'); return; }
+      this.textContent = 'Verifica...';
+      this.disabled = true;
+      try {
+        var res = await fetch('/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, otp: otp })
+        });
+        var data = await res.json();
+        if (data.success && data.token) {
+          localStorage.setItem('fl_token', data.token);
+          if (pendingPiano) {
+            var p = pendingPiano;
+            pendingPiano = null;
+            startCheckout(p, data.token);
+          } else {
+            window.location.href = '/app';
+          }
+        } else {
+          showModalError(data.error || 'Codice errato o scaduto. Riprova.');
+          this.textContent = 'Accedi';
+          this.disabled = false;
+        }
+      } catch(e) {
+        showModalError('Errore di connessione. Riprova.');
+        this.textContent = 'Accedi';
+        this.disabled = false;
+      }
+    });
+
+    // Reinvia OTP
+    document.getElementById('modal-reinvia').addEventListener('click', function() {
+      document.getElementById('modal-btn-continua').disabled = false;
+      document.getElementById('modal-btn-continua').textContent = 'Continua';
+      document.getElementById('modal-btn-continua').click();
+    });
+
+    // Chiudi cliccando overlay
+    document.getElementById('login-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeLoginModal();
+    });
+
+    function showModalError(msg) {
+      var el = document.getElementById('modal-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    // Check token al caricamento pagina
+    (function() {
+      var _token = localStorage.getItem('fl_token');
+      if (_token) {
+        document.querySelectorAll('a[href="/app"]').forEach(function(el) {
+          el.textContent = el.classList.contains('btn-header') ? 'Dashboard \u2192' : el.textContent;
+          el.href = '/app';
+        });
+        var accedi = document.querySelector('.header-right a:first-child');
+        if (accedi) accedi.textContent = 'Dashboard';
       }
     })();
 

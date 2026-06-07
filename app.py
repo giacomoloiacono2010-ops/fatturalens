@@ -3,6 +3,8 @@ import re
 import json
 import uuid
 import random
+import base64
+import mimetypes
 import sqlite3
 import shutil
 import time
@@ -323,6 +325,71 @@ def call_openrouter(prompt_text, temperature=0.1):
     except Exception:
         return None
 
+
+def call_openrouter_vision(image_path, temperature=0.1):
+    mime_type, _ = mimetypes.guess_type(image_path)
+    if not mime_type or not mime_type.startswith('image/'):
+        mime_type = 'image/jpeg'
+    try:
+        with open(image_path, 'rb') as f:
+            b64 = base64.b64encode(f.read()).decode('utf-8')
+    except Exception:
+        return None
+
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "openai/gpt-4o-mini",
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "Sei un sistema che estrae dati da fatture in formato PDF o immagine. "
+                    "Rispondi SOLO con un JSON valido (nessun testo aggiuntivo, nessun markdown). "
+                    "Il JSON deve avere ESATTAMENTE questi campi: "
+                    "data_emissione (stringa YYYY-MM-DD), numero_fattura (stringa), "
+                    "p_iva_fornitore (stringa), nome_fornitore (stringa), "
+                    "imponibile (float), importo_iva (float), totale_fattura (float)."
+                )
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:{mime_type};base64,{b64}"
+                        }
+                    },
+                    {
+                        "type": "text",
+                        "text": "Estrai i dati da questa fattura. Rispondi SOLO con JSON valido con i campi: data_emissione, numero_fattura, p_iva_fornitore, nome_fornitore, imponibile, importo_iva, totale_fattura."
+                    }
+                ]
+            }
+        ],
+        "temperature": temperature,
+        "max_tokens": 500
+    }
+    try:
+        resp = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=60
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data['choices'][0]['message']['content'].strip()
+        content = re.sub(r'^```(?:json)?\s*', '', content)
+        content = re.sub(r'\s*```$', '', content)
+        return json.loads(content)
+    except Exception:
+        return None
+
+
 def generate_excel(invoice_data_list, excel_path):
     df = pd.DataFrame(invoice_data_list, columns=[
         'Data', 'Numero', 'Fornitore', 'P.IVA', 'Imponibile', 'IVA', 'Totale'
@@ -417,6 +484,21 @@ def login():
     })
 
 
+@app.route('/verify-otp', methods=['POST'])
+def verify_otp_route():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    otp = data.get('otp', '').strip()
+    if not email or not otp:
+        return jsonify({'success': False, 'error': 'Email e codice richiesti'}), 400
+    conn = get_db()
+    token = verify_otp(conn, email, otp)
+    conn.close()
+    if token is None:
+        return jsonify({'success': False, 'error': 'Codice errato o scaduto'}), 401
+    return jsonify({'success': True, 'token': token})
+
+
 # ---- ROUTES: APP ----
 @app.route('/upload', methods=['POST'])
 @limiter.limit("10 per minute")
@@ -430,15 +512,22 @@ def upload():
     if file.filename == '':
         return jsonify({'success': False, 'error': 'Empty filename'}), 400
 
-    pdf_filename = secure_filename(file.filename)
-    pdf_path = os.path.join(UPLOAD_FOLDER, f"{uuid.uuid4().hex}_{pdf_filename}")
-    file.save(pdf_path)
+    filename = secure_filename(file.filename)
+    ext = os.path.splitext(filename)[1].lower()
+    pdf_exts = {'.pdf'}
+    img_exts = {'.jpg', '.jpeg', '.png', '.webp'}
+
+    if ext not in pdf_exts | img_exts:
+        return jsonify({'success': False, 'error': 'Formato non supportato. Carica un PDF, JPG, PNG o WEBP.'}), 400
+
+    saved_path = os.path.join(UPLOAD_FOLDER, f"{uuid.uuid4().hex}_{filename}")
+    file.save(saved_path)
 
     user = get_or_create_user(email)
 
     if user['fatture_processate_mese'] >= user['limite_mensile']:
-        os.remove(pdf_path)
-        logger.warning(f"UPLOAD|{email}|{pdf_filename}|monthly_limit_exceeded")
+        os.remove(saved_path)
+        logger.warning(f"UPLOAD|{email}|{filename}|monthly_limit_exceeded")
         return jsonify({'success': False, 'error': 'Limite esaurito. Passa a Base o Pro.'}), 403
 
     conn_check = get_db()
@@ -450,36 +539,39 @@ def upload():
         ).fetchone()[0]
         if daily_count >= 500:
             conn_check.close()
-            os.remove(pdf_path)
-            logger.warning(f"UPLOAD|{email}|{pdf_filename}|daily_limit_exceeded_pro")
+            os.remove(saved_path)
+            logger.warning(f"UPLOAD|{email}|{filename}|daily_limit_exceeded_pro")
             return jsonify({'success': False, 'error': 'Hai raggiunto il limite giornaliero di 500 fatture.'}), 429
     conn_check.close()
 
-    pdf_text = extract_pdf_text(pdf_path)
-    if pdf_text is None or pdf_text == '':
-        os.remove(pdf_path)
-        logger.warning(f"UPLOAD|{email}|{pdf_filename}|no_text_extracted")
-        if pdf_text is None:
-            return jsonify({'success': False, 'error': 'Impossibile leggere il PDF. File corrotto o formato non supportato.'}), 422
-        return jsonify({'success': False, 'error': 'PDF senza testo estraibile. Carica un PDF con testo selezionabile.'}), 422
-
     parsed = None
-    for attempt, temp in enumerate([0.1, 0]):
-        parsed = call_openrouter(pdf_text, temperature=temp)
-        if parsed is not None:
-            break
+    if ext in pdf_exts:
+        pdf_text = extract_pdf_text(saved_path)
+        if pdf_text is None or pdf_text == '':
+            os.remove(saved_path)
+            logger.warning(f"UPLOAD|{email}|{filename}|no_text_extracted")
+            if pdf_text is None:
+                return jsonify({'success': False, 'error': 'Impossibile leggere il file. File corrotto o formato non supportato.'}), 422
+            return jsonify({'success': False, 'error': 'File senza testo estraibile. Carica un PDF con testo selezionabile.'}), 422
+
+        for attempt, temp in enumerate([0.1, 0]):
+            parsed = call_openrouter(pdf_text, temperature=temp)
+            if parsed is not None:
+                break
+    else:
+        parsed = call_openrouter_vision(saved_path)
 
     conn = get_db()
     try:
         if parsed is None:
             conn.execute(
                 "INSERT INTO fatture (utente_id, nome_file, status) VALUES (?, ?, 'error')",
-                (user['id'], pdf_filename)
+                (user['id'], filename)
             )
             conn.commit()
             conn.close()
-            os.remove(pdf_path)
-            logger.error(f"UPLOAD|{email}|{pdf_filename}|json_parse_failed")
+            os.remove(saved_path)
+            logger.error(f"UPLOAD|{email}|{filename}|json_parse_failed")
             return jsonify({'success': False, 'error': 'Impossibile estrarre dati strutturati dalla fattura. Riprova.'}), 422
 
         cleaned = postprocess_json(parsed)
@@ -500,7 +592,7 @@ def upload():
 
         conn.execute(
             "INSERT INTO fatture (utente_id, nome_file, json_estratto, excel_path, status) VALUES (?, ?, ?, ?, 'done')",
-            (user['id'], pdf_filename, json.dumps(cleaned), excel_path)
+            (user['id'], filename, json.dumps(cleaned), excel_path)
         )
         conn.commit()
         invoice_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
@@ -511,9 +603,9 @@ def upload():
         )
         conn.commit()
         conn.close()
-        os.remove(pdf_path)
+        os.remove(saved_path)
 
-        logger.info(f"UPLOAD|{email}|{pdf_filename}|success|invoice_{invoice_id}")
+        logger.info(f"UPLOAD|{email}|{filename}|success|invoice_{invoice_id}")
 
         return jsonify({
             'success': True,
@@ -524,9 +616,9 @@ def upload():
     except Exception as e:
         conn.rollback()
         conn.close()
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
-        logger.error(f"UPLOAD|{email}|{pdf_filename}|exception: {str(e)}")
+        if os.path.exists(saved_path):
+            os.remove(saved_path)
+        logger.error(f"UPLOAD|{email}|{filename}|exception: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/download/<int:invoice_id>', methods=['GET'])
@@ -616,6 +708,49 @@ def cancel_subscription():
     conn.close()
     logger.info(f"CANCEL|{user['email']}|downgraded_to_free")
     return jsonify({'success': True, 'message': 'Abbonamento cancellato. Tornerai a Free.'})
+
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    data = request.get_json()
+    if not data:
+        return jsonify({'success': False, 'error': 'Dati richiesti'}), 400
+
+    token = data.get('token', '')
+    piano = data.get('piano', '').strip().lower()
+
+    if not token or piano not in ('base', 'pro'):
+        return jsonify({'success': False, 'error': 'Parametri non validi'}), 400
+
+    conn = get_db()
+    user = conn.execute("SELECT * FROM utenti WHERE token = ?", (token,)).fetchone()
+    conn.close()
+
+    if user is None:
+        return jsonify({'success': False, 'error': 'Token non valido'}), 401
+
+    PRICE_MAP = {
+        'base': 'price_1TddtjRqsyVYsJ482JUsz8VH',
+        'pro': 'price_1TddtkRqsyVYsJ48R94zWXzG',
+    }
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            mode='subscription',
+            payment_method_types=['card'],
+            customer_email=user['email'],
+            line_items=[{
+                'price': PRICE_MAP[piano],
+                'quantity': 1,
+            }],
+            success_url=request.host_url + 'app?upgraded=1',
+            cancel_url=request.host_url + '#prezzi',
+        )
+        logger.info(f"CHECKOUT|{user['email']}|{piano}|session_{checkout_session.id}")
+        return jsonify({'success': True, 'url': checkout_session.url})
+    except Exception as e:
+        logger.error(f"CHECKOUT|{user['email']}|stripe_error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/webhook/stripe', methods=['POST'])
@@ -718,7 +853,7 @@ def serve_landing():
 
 @app.route('/app')
 def serve_app():
-    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'dashboard.html')
 
 @app.route('/privacy')
 def serve_privacy():

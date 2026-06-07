@@ -177,9 +177,9 @@
             <path d="M16 36H18M30 36H32" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </div>
-        <p class="drop-text">Trascina il PDF qui</p>
-        <p class="drop-sub">oppure clicca per selezionare &middot; Solo PDF con testo estraibile</p>
-        <input type="file" id="file-input" accept=".pdf,application/pdf">
+        <p class="drop-text">Trascina la fattura qui</p>
+        <p class="drop-sub">oppure clicca per selezionare &middot; PDF o foto fattura</p>
+        <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png,.webp">
       </div>
     </div>
 
@@ -234,7 +234,7 @@
             <line x1="16" y1="26" x2="28" y2="26" stroke="#d1d5db" stroke-width="2" stroke-linecap="round"/>
           </svg>
           <p>Nessuna fattura caricata</p>
-          <p class="sub">Carica il primo PDF per iniziare.</p>
+          <p class="sub">Carica la prima fattura per iniziare.</p>
         </div>
       </div>
     </div>
@@ -262,7 +262,7 @@
 
     // REAL UPLOAD
     async function handleUpload(file) {
-      if (!file || file.type !== 'application/pdf') { alert('Carica un file PDF'); return; }
+      if (!file || !['application/pdf','image/jpeg','image/png','image/webp'].includes(file.type)) { alert('Carica un PDF, JPG, PNG o WEBP'); return; }
       var token = localStorage.getItem('fl_token');
       anteprima.style.display = 'none';
       errore.style.display = 'none';
