@@ -20,6 +20,7 @@ from werkzeug.utils import secure_filename
 import pdfplumber
 import stripe
 import pandas as pd
+import requests
 
 load_dotenv()
 
@@ -585,6 +586,38 @@ def dashboard():
         ]
     })
 
+
+@app.route('/settings')
+def serve_settings():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'settings.html')
+
+
+@app.route('/cancel-subscription', methods=['POST'])
+def cancel_subscription():
+    data = request.get_json()
+    token = data.get('token', '')
+    if not token:
+        return jsonify({'success': False, 'error': 'Token richiesto'}), 401
+    conn = get_db()
+    user = conn.execute("SELECT * FROM utenti WHERE token = ?", (token,)).fetchone()
+    if user is None:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Token non valido'}), 401
+    if user['stripe_customer_id'] and stripe.api_key:
+        try:
+            subscriptions = stripe.Subscription.list(customer=user['stripe_customer_id'], status='active', limit=1)
+            for sub in subscriptions.auto_paging_iter():
+                stripe.Subscription.modify(sub['id'], cancel_at_period_end=True)
+                break
+        except Exception as e:
+            logger.error(f"CANCEL|{user['email']}|stripe_error: {e}")
+    conn.execute("UPDATE utenti SET piano = 'free', limite_mensile = 5 WHERE id = ?", (user['id'],))
+    conn.commit()
+    conn.close()
+    logger.info(f"CANCEL|{user['email']}|downgraded_to_free")
+    return jsonify({'success': True, 'message': 'Abbonamento cancellato. Tornerai a Free.'})
+
+
 @app.route('/webhook/stripe', methods=['POST'])
 def stripe_webhook():
     payload = request.get_data(as_text=True)
@@ -681,7 +714,7 @@ def favicon():
 
 @app.route('/')
 def serve_landing():
-    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'landing.html')
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
 
 @app.route('/app')
 def serve_app():

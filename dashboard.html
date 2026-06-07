@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — FatturaLens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; background:#f8fafc; color:#0f172a; }
+
+    /* HEADER */
+    header {
+      position:fixed; top:0; left:0; right:0; height:64px; z-index:100;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 32px; background:#fff; border-bottom:1px solid #e2e8f0;
+    }
+    .header-left { display:flex; align-items:center; gap:12px; }
+    .logo { font-family:'Plus Jakarta Sans',sans-serif; font-size:18px; font-weight:700; color:#0f172a; text-decoration:none; }
+    .header-sub { font-size:11px; color:#94a3b8; }
+    .header-nav { display:flex; align-items:center; gap:24px; }
+    .nav-link { font-size:14px; font-weight:500; color:#64748b; text-decoration:none; padding-bottom:4px; transition:color 0.2s; }
+    .nav-link:hover { color:#0f172a; }
+    .nav-link.active { color:#0f172a; border-bottom:2px solid #6366f1; }
+    .header-right { display:flex; align-items:center; gap:12px; }
+    .piano-badge { font-size:12px; font-weight:600; color:#64748b; background:#f1f5f9; padding:4px 14px; border-radius:20px; }
+    .btn-pro { display:inline-flex; align-items:center; justify-content:center; padding:8px 16px; background:#6366f1; color:#fff; font-size:13px; font-weight:600; border:none; border-radius:8px; text-decoration:none; transition:background 0.2s; }
+    .btn-pro:hover { background:#4f46e5; }
+    .logout-btn { background:none; border:none; cursor:pointer; display:flex; padding:6px; border-radius:6px; transition:background 0.2s; }
+    .logout-btn:hover { background:#f1f5f9; }
+
+    /* MAIN */
+    main { max-width:900px; margin:0 auto; padding:80px 24px 60px; margin-top:64px; }
+
+    /* STATS ROW */
+    .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+    .stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+    .stat-label { font-size:13px; font-weight:500; color:#64748b; margin-bottom:6px; }
+    .stat-number { font-family:'Plus Jakarta Sans',sans-serif; font-size:28px; font-weight:800; color:#0f172a; }
+    .stat-sub { font-size:12px; color:#94a3b8; margin-top:2px; }
+    .progress-wrap { width:100%; height:6px; background:#f1f5f9; border-radius:3px; margin-top:10px; }
+    .progress-fill { height:6px; border-radius:3px; background:#6366f1; width:0%; transition:width 0.4s ease; }
+    .stat-link { display:inline-block; font-size:13px; font-weight:600; color:#6366f1; text-decoration:none; margin-top:10px; }
+    .stat-link:hover { text-decoration:underline; }
+
+    /* BANNER PIANO */
+    .banner-piano { background:#eef2ff; border:1px solid #c7d2fe; border-radius:12px; padding:20px 24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:28px; }
+    .banner-piano p { font-size:14px; color:#4338ca; }
+    .banner-piano .btn-sm { padding:10px 20px; background:#6366f1; color:#fff; font-size:14px; font-weight:600; border:none; border-radius:8px; text-decoration:none; transition:background 0.2s; }
+    .banner-piano .btn-sm:hover { background:#4f46e5; }
+
+    /* DROP ZONE */
+    .drop-zone {
+      background:#fff; border-radius:12px; padding:24px; box-shadow:0 1px 3px rgba(0,0,0,0.06); cursor:pointer;
+      transition:box-shadow 0.2s, transform 0.2s;
+    }
+    .drop-zone:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); }
+    .drop-inner {
+      border:2px dashed #c7d2fe; border-radius:12px; padding:48px 24px; text-align:center;
+      background:#f5f3ff; transition:all 0.2s;
+    }
+    .drop-zone.dragover .drop-inner { border-color:#6366f1; background:#eef2ff; transform:scale(1.01); }
+    .drop-icon { margin-bottom:12px; }
+    .drop-text { font-size:16px; font-weight:600; color:#374151; margin-bottom:4px; }
+    .drop-sub { font-size:13px; color:#9ca3af; }
+    input[type="file"] { display:none; }
+
+    /* SPINNER */
+    .spinner-wrap { display:none; text-align:center; padding:40px 0; }
+    .spinner { width:36px; height:36px; border:3px solid #e2e8f0; border-top:3px solid #6366f1; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 16px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .spinner-text { font-size:14px; color:#64748b; }
+
+    /* ANTEPRIMA */
+    .anteprima { display:none; background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); margin-top:24px; overflow:hidden; }
+    .anteprima-header { background:#f0fdf4; border-left:3px solid #22c55e; padding:16px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+    .anteprima-header h3 { font-size:16px; font-weight:600; color:#166534; }
+    .anteprima-body { padding:20px 24px; overflow-x:auto; }
+    .table-data { width:100%; border-collapse:collapse; }
+    .table-data th { background:#f8fafc; font-size:11px; font-weight:700; text-transform:uppercase; color:#6b7280; padding:10px 14px; text-align:left; border-bottom:1px solid #e2e8f0; }
+    .table-data td { padding:10px 14px; font-size:14px; color:#0f172a; border-bottom:1px solid #f1f5f9; }
+    .table-data tr:last-child td { border-bottom:none; }
+    .btn-scarica { display:inline-flex; align-items:center; gap:6px; padding:10px 20px; background:#6366f1; color:#fff; font-size:14px; font-weight:600; border:none; border-radius:8px; text-decoration:none; transition:background 0.2s; }
+    .btn-scarica:hover { background:#4f46e5; }
+
+    /* ERRORE */
+    .errore { display:none; background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:16px 20px; margin-top:24px; align-items:center; gap:12px; }
+    .errore svg { flex-shrink:0; }
+    .errore p { font-size:14px; color:#991b1b; }
+
+    /* STORICO */
+    .storico { margin-top:40px; }
+    .storico-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+    .storico-header h2 { font-size:18px; font-weight:700; color:#0f172a; }
+    .storico-card { background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.06); overflow:hidden; }
+    .table-storico { width:100%; border-collapse:collapse; }
+    .table-storico th { background:#f8fafc; font-size:11px; font-weight:700; text-transform:uppercase; color:#6b7280; padding:10px 14px; text-align:left; border-bottom:1px solid #e2e8f0; }
+    .table-storico td { padding:10px 14px; font-size:14px; color:#0f172a; border-bottom:1px solid #f1f5f9; }
+    .table-storico tr:last-child td { border-bottom:none; }
+    .badge-completato { display:inline-block; font-size:12px; font-weight:600; color:#059669; background:#ecfdf5; padding:2px 10px; border-radius:20px; }
+    .badge-errore { display:inline-block; font-size:12px; font-weight:600; color:#dc2626; background:#fef2f2; padding:2px 10px; border-radius:20px; }
+    .action-link { font-size:14px; font-weight:500; color:#6366f1; text-decoration:none; }
+    .action-link:hover { text-decoration:underline; }
+    .empty-state { display:none; text-align:center; padding:48px 24px; }
+    .empty-state svg { margin-bottom:12px; }
+    .empty-state p { font-size:16px; color:#6b7280; }
+    .empty-state .sub { font-size:14px; color:#9ca3af; margin-top:4px; }
+
+    /* RESPONSIVE */
+    @media (max-width:768px) {
+      header { padding:0 16px; }
+      .header-nav { gap:14px; }
+      .nav-link { font-size:13px; }
+      .header-sub { display:none; }
+      .stats-row { grid-template-columns:1fr; }
+      main { padding:72px 16px 40px; }
+      .drop-inner { padding:32px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <a href="/" class="logo">FatturaLens</a>
+      <span class="header-sub">Estrazione dati da fatture PDF</span>
+    </div>
+    <div class="header-nav">
+      <a href="#" class="nav-link active">Dashboard</a>
+      <a href="#storico" class="nav-link">Storico</a>
+      <a href="/impostazioni" class="nav-link">Impostazioni</a>
+    </div>
+    <div class="header-right">
+      <span class="piano-badge" id="badge-piano">Piano Free</span>
+      <a href="/#prezzi" class="btn-pro">Passa a Pro</a>
+      <button class="logout-btn" onclick="localStorage.removeItem('fl_token');window.location.href='/'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- STATS -->
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Fatture questo mese</div>
+        <div class="stat-number" id="stat-fatture">—</div>
+        <div class="stat-sub">di <span id="stat-limite">5</span> disponibili</div>
+        <div class="progress-wrap"><div class="progress-fill" id="progress-bar"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Piano attivo</div>
+        <div class="stat-number" id="stat-piano">—</div>
+        <a href="/#prezzi" class="stat-link">Cambia piano &rarr;</a>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Membro dal</div>
+        <div class="stat-number" id="stat-data">—</div>
+      </div>
+    </div>
+
+    <!-- BANNER PIANO -->
+    <div class="banner-piano" id="banner-piano">
+      <p>Hai usato <strong id="banner-count">—</strong> fatture gratis. Passa a Base per 100 al mese.</p>
+      <a href="/#prezzi" class="btn-sm">Vedi prezzi</a>
+    </div>
+
+    <!-- UPLOAD -->
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="drop-inner">
+        <div class="drop-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="12" width="32" height="28" rx="4" stroke="#6366f1" stroke-width="2"/>
+            <path d="M24 30V16M24 16l-6 6M24 16l6 6" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 36H18M30 36H32" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <p class="drop-text">Trascina il PDF qui</p>
+        <p class="drop-sub">oppure clicca per selezionare &middot; Solo PDF con testo estraibile</p>
+        <input type="file" id="file-input" accept=".pdf,application/pdf">
+      </div>
+    </div>
+
+    <!-- SPINNER -->
+    <div class="spinner-wrap" id="spinner">
+      <div class="spinner"></div>
+      <p class="spinner-text">Analisi in corso con AI&hellip;</p>
+    </div>
+
+    <!-- ANTEPRIMA -->
+    <div class="anteprima" id="anteprima">
+      <div class="anteprima-header">
+        <h3>&check; Dati estratti correttamente</h3>
+        <a href="#" class="btn-scarica" id="btn-scarica">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Scarica Excel
+        </a>
+      </div>
+      <div class="anteprima-body">
+        <table class="table-data">
+          <thead>
+            <tr><th>Data</th><th>Numero</th><th>Fornitore</th><th>P.IVA</th><th>Imponibile</th><th>IVA</th><th>Totale</th></tr>
+          </thead>
+          <tbody id="anteprima-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ERRORE -->
+    <div class="errore" id="errore">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <p id="errore-testo">Impossibile leggere la fattura. Hai caricato una scansione? Le scansioni non sono supportate.</p>
+    </div>
+
+    <!-- STORICO -->
+    <div class="storico" id="storico">
+      <div class="storico-header">
+        <h2>Storico fatture</h2>
+        <a href="#" class="action-link">Vedi tutto</a>
+      </div>
+      <div class="storico-card">
+        <table class="table-storico">
+          <thead>
+            <tr><th>Data</th><th>Nome file</th><th>Stato</th><th>Azione</th></tr>
+          </thead>
+          <tbody id="storico-tbody"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <rect x="8" y="8" width="32" height="36" rx="4" stroke="#d1d5db" stroke-width="2"/>
+            <line x1="16" y1="18" x2="32" y2="18" stroke="#d1d5db" stroke-width="2" stroke-linecap="round"/>
+            <line x1="16" y1="26" x2="28" y2="26" stroke="#d1d5db" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <p>Nessuna fattura caricata</p>
+          <p class="sub">Carica il primo PDF per iniziare.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    var anteprima = document.getElementById('anteprima');
+    var errore = document.getElementById('errore');
+    var spinner = document.getElementById('spinner');
+
+    // Drag & drop handlers
+    var dropZone = document.getElementById('drop-zone');
+    ['dragenter','dragover'].forEach(function(evt) {
+      dropZone.addEventListener(evt, function(e) { e.preventDefault(); dropZone.classList.add('dragover'); });
+    });
+    ['dragleave','drop'].forEach(function(evt) {
+      dropZone.addEventListener(evt, function(e) { e.preventDefault(); dropZone.classList.remove('dragover'); });
+    });
+    document.getElementById('file-input').addEventListener('change', function(e) {
+      if (e.target.files.length) handleUpload(e.target.files[0]);
+    });
+    dropZone.addEventListener('drop', function(e) {
+      if (e.dataTransfer.files.length) handleUpload(e.dataTransfer.files[0]);
+    });
+
+    // REAL UPLOAD
+    async function handleUpload(file) {
+      if (!file || file.type !== 'application/pdf') { alert('Carica un file PDF'); return; }
+      var token = localStorage.getItem('fl_token');
+      anteprima.style.display = 'none';
+      errore.style.display = 'none';
+      spinner.style.display = 'block';
+
+      var formData = new FormData();
+      formData.append('pdf', file);
+      formData.append('token', token);
+
+      try {
+        var res = await fetch('/upload', { method: 'POST', body: formData });
+        var data = await res.json();
+        spinner.style.display = 'none';
+        if (data.success) {
+          var d = data.data;
+          document.getElementById('anteprima-tbody').innerHTML =
+            '<tr><td>' + [d['Data'],d['Numero'],d['Fornitore'],d['P.IVA'],d['Imponibile'],d['IVA'],d['Totale']].join('</td><td>') + '</td></tr>';
+          document.getElementById('btn-scarica').href = data.excel_url;
+          anteprima.style.display = 'block';
+          loadDashboard();
+        } else {
+          document.getElementById('errore-testo').textContent = data.error || 'Errore sconosciuto.';
+          errore.style.display = 'flex';
+        }
+      } catch(e) {
+        spinner.style.display = 'none';
+        document.getElementById('errore-testo').textContent = 'Errore di connessione. Riprova.';
+        errore.style.display = 'flex';
+      }
+    }
+
+    // SMOOTH SCROLL per ancore
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // HEADER SCROLL SHADOW
+    window.addEventListener('scroll', function() {
+      var h = document.querySelector('header');
+      if (window.scrollY > 10) h.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+      else h.style.boxShadow = 'none';
+    });
+
+    // LOAD DASHBOARD FROM BACKEND
+    async function loadDashboard() {
+      var token = localStorage.getItem('fl_token');
+      if (!token) { window.location.href = '/'; return; }
+      try {
+        var res = await fetch('/dashboard?token=' + token);
+        var data = await res.json();
+        if (!data.success) { localStorage.removeItem('fl_token'); window.location.href = '/'; return; }
+
+        // Stats
+        document.getElementById('stat-fatture').textContent = data.user.fatture_processate_mese + ' / ' + data.user.limite_mensile;
+        document.getElementById('stat-limite').textContent = data.user.limite_mensile;
+        document.getElementById('stat-piano').textContent = data.user.piano.charAt(0).toUpperCase() + data.user.piano.slice(1);
+        document.getElementById('stat-data').textContent = new Date(data.user.iscritto_dal).toLocaleDateString('it-IT');
+        document.getElementById('badge-piano').textContent = 'Piano ' + data.user.piano.charAt(0).toUpperCase() + data.user.piano.slice(1);
+        document.getElementById('banner-count').textContent = data.user.fatture_processate_mese + ' di ' + data.user.limite_mensile;
+
+        // Progress bar
+        var pct = Math.min(100, (data.user.fatture_processate_mese / data.user.limite_mensile) * 100);
+        document.getElementById('progress-bar').style.width = pct + '%';
+
+        // Popola storico
+        var tbody = document.getElementById('storico-tbody');
+        if (!data.storico || data.storico.length === 0) {
+          document.getElementById('empty-state').style.display = 'block';
+          tbody.parentElement.style.display = 'none';
+        } else {
+          document.getElementById('empty-state').style.display = 'none';
+          tbody.parentElement.style.display = '';
+          data.storico.forEach(function(row) {
+            var tr = document.createElement('tr');
+            var d = new Date(row.created_at).toLocaleDateString('it-IT');
+            var status = row.status === 'done'
+              ? '<span class="badge-completato">Completato</span>'
+              : '<span class="badge-errore">Errore</span>';
+            var azione = row.status === 'done'
+              ? '<a href="/download/' + row.id + '" class="action-link">Scarica</a>'
+              : '<span style="color:#9ca3af">&mdash;</span>';
+            tr.innerHTML = '<td>' + d + '</td><td>' + (row.file || '—') + '</td><td>' + status + '</td><td>' + azione + '</td>';
+            tbody.appendChild(tr);
+          });
+        }
+      } catch(e) {
+        window.location.href = '/';
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
