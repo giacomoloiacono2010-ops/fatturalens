@@ -89,14 +89,6 @@ td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
 .auth-tab{padding:.6rem 1.2rem;font-family:Syne,sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;color:#555;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none}
 .auth-tab.active{color:#c8ff00;border-bottom-color:#c8ff00}
 .auth-tab:hover{color:#f5f2eb}
-/* OTP */
-.otp-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:.5rem 0}
-.otp-box p{color:#888;font-size:.8rem;text-align:center}
-.otp-row{display:flex;gap:.5rem;justify-content:center}
-.otp-digit{width:48px;height:56px;background:#1a1a1a;border:1px solid #333;border-radius:8px;text-align:center;font-family:Syne,sans-serif;font-size:1.5rem;font-weight:700;color:#f5f2eb;outline:none;transition:border .15s}
-.otp-digit:focus{border-color:#c8ff00}
-.otp-timer{color:#555;font-size:.7rem}
-.user-email-display{font-size:.75rem;color:#888;margin-bottom:.5rem}
 @media(max-width:480px){
 .container{padding:1rem .75rem}
 .header-brand h1{font-size:1.2rem}
@@ -104,7 +96,6 @@ td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
 .dropzone{min-height:160px;padding:1.5rem}
 .btn{font-size:.8rem;padding:.6rem 1.2rem}
 table{font-size:.7rem}
-.otp-digit{width:40px;height:48px;font-size:1.2rem}
 }
 </style>
 </head>
@@ -133,35 +124,27 @@ table{font-size:.7rem}
         <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Registrati</button>
       </div>
 
-      <!-- Step 1: Email -->
-      <div id="authStepEmail">
+      <!-- Login form -->
+      <div id="loginForm">
         <div id="authAlert" class="alert"></div>
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-          <input id="authEmail" class="input" type="email" placeholder="tua@email.it" style="flex:1;min-width:180px" onkeydown="if(event.key==='Enter')sendAuth()">
-          <button id="authBtn" class="btn btn-primary" onclick="sendAuth()">Invia codice</button>
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <input id="loginEmail" class="input" type="email" placeholder="Email" autocomplete="email">
+          <div>
+            <input id="loginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+          </div>
+          <button id="loginBtn" class="btn btn-primary" onclick="doLogin()">Accedi</button>
         </div>
-        <p id="authModeText" class="text-muted mt-1">Riceverai un codice OTP via email.</p>
       </div>
 
-      <!-- Step 2: OTP -->
-      <div id="authStepOtp" style="display:none">
-        <div class="otp-box">
-          <div class="user-email-display" id="otpEmailDisplay"></div>
-          <p>Inserisci il codice a 6 cifre</p>
-          <div class="otp-row">
-            <input class="otp-digit" maxlength="1" data-index="0" oninput="otpDigitInput(this)">
-            <input class="otp-digit" maxlength="1" data-index="1" oninput="otpDigitInput(this)">
-            <input class="otp-digit" maxlength="1" data-index="2" oninput="otpDigitInput(this)">
-            <input class="otp-digit" maxlength="1" data-index="3" oninput="otpDigitInput(this)">
-            <input class="otp-digit" maxlength="1" data-index="4" oninput="otpDigitInput(this)">
-            <input class="otp-digit" maxlength="1" data-index="5" oninput="otpDigitInput(this)">
-          </div>
-          <span class="otp-timer" id="otpTimer">Codice valido per 10 minuti</span>
-          <div style="display:flex;gap:.5rem;margin-top:.5rem">
-            <button class="btn btn-primary" onclick="verifyOtp()">Verifica</button>
-            <button class="btn btn-outline" onclick="backToEmail()">Cambia email</button>
-          </div>
-          <div id="otpAlert" class="alert" style="width:100%"></div>
+      <!-- Register form -->
+      <div id="registerForm" style="display:none">
+        <div id="regAlert" class="alert"></div>
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <input id="regName" class="input" type="text" placeholder="Nome e cognome" autocomplete="name">
+          <input id="regEmail" class="input" type="email" placeholder="Email" autocomplete="email">
+          <input id="regPassword" class="input" type="password" placeholder="Password (min. 6 caratteri)" autocomplete="new-password">
+          <input id="regPasswordConfirm" class="input" type="password" placeholder="Conferma password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+          <button id="regBtn" class="btn btn-primary" onclick="doRegister()">Registrati</button>
         </div>
       </div>
     </div>
@@ -218,8 +201,6 @@ table{font-size:.7rem}
 const API_URL = window.location.origin;
 let TOKEN = '';
 let USER = null;
-let AUTH_EMAIL = '';
-let AUTH_MODE = 'login'; // 'login' or 'register'
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
@@ -229,171 +210,148 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ============ AUTH TABS ============
 function switchAuthTab(mode) {
-  AUTH_MODE = mode;
+  document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
+  document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
   document.getElementById('tabLogin').className = 'auth-tab' + (mode==='login' ? ' active' : '');
   document.getElementById('tabRegister').className = 'auth-tab' + (mode==='register' ? ' active' : '');
-  document.getElementById('authModeText').textContent = mode==='login'
-    ? 'Riceverai un codice OTP per accedere.'
-    : 'Riceverai un codice OTP per confermare la registrazione.';
-  const btn = document.getElementById('authBtn');
-  btn.textContent = 'Invia codice';
   document.getElementById('authAlert').className = 'alert';
   document.getElementById('authAlert').classList.remove('show');
+  document.getElementById('regAlert').className = 'alert';
+  document.getElementById('regAlert').classList.remove('show');
 }
 
-// ============ SEND OTP ============
-async function sendAuth() {
-  const email = document.getElementById('authEmail').value.trim();
-  if (!email) return;
-
-  AUTH_EMAIL = email;
-  const btn = document.getElementById('authBtn');
-  btn.disabled = true;
-  btn.textContent = 'Invio...';
+// ============ LOGIN ============
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
 
   const alert = document.getElementById('authAlert');
   alert.className = 'alert';
   alert.textContent = '';
   alert.classList.remove('show');
 
-  const endpoint = AUTH_MODE === 'register' ? '/register' : '/login-send-otp';
+  if (!email || !password) {
+    alert.className = 'alert alert-error show';
+    alert.textContent = 'Inserisci email e password.';
+    return;
+  }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Accesso...';
 
   try {
-    const res = await fetch(`${API_URL}${endpoint}`, {
+    const res = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({email})
+      body: JSON.stringify({email, password})
     });
     const data = await res.json();
 
     if (data.success) {
-      // Switch to OTP step
-      document.getElementById('authStepEmail').style.display = 'none';
-      document.getElementById('authStepOtp').style.display = 'block';
-      document.getElementById('otpEmailDisplay').textContent = email;
-
-      // In development, show OTP in alert
-      if (data.dev_otp) {
-        alert.className = 'alert alert-info show';
-        alert.innerHTML = 'Modalità sviluppo: il tuo codice è <strong>' + data.dev_otp + '</strong>';
-      }
-
-      // Focus first digit
-      document.querySelector('.otp-digit').focus();
-
-      // Reset OTP inputs
-      document.querySelectorAll('.otp-digit').forEach(el => el.value = '');
+      TOKEN = data.token;
+      USER = data.user;
+      localStorage.setItem('fatturalens_token', TOKEN);
+      enterDashboard(data.user);
     } else {
       alert.className = 'alert alert-error show';
-      alert.textContent = data.error || 'Errore durante l\'invio del codice.';
+      alert.textContent = data.error || 'Email o password errate.';
     }
   } catch(e) {
     alert.className = 'alert alert-error show';
-    alert.textContent = 'Errore di connessione al server.';
+    alert.textContent = 'Errore di connessione.';
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Invia codice';
+    btn.textContent = 'Accedi';
   }
 }
 
-// ============ OTP INPUT ============
-function otpDigitInput(el) {
-  const idx = parseInt(el.dataset.index);
-  el.value = el.value.replace(/[^0-9]/g, '').slice(0,1);
-  if (el.value && idx < 5) {
-    document.querySelector(`.otp-digit[data-index="${idx+1}"]`).focus();
-  }
-  // If last digit, auto-verify after short delay
-  if (idx === 5 && el.value) {
-    setTimeout(verifyOtp, 300);
-  }
-  // Clear error on typing
-  document.getElementById('otpAlert').className = 'alert';
-  document.getElementById('otpAlert').classList.remove('show');
-}
+// ============ REGISTER ============
+async function doRegister() {
+  const nome = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const password_confirm = document.getElementById('regPasswordConfirm').value;
 
-// ============ VERIFY OTP ============
-async function verifyOtp() {
-  const digits = [];
-  document.querySelectorAll('.otp-digit').forEach(el => digits.push(el.value));
-  const otp = digits.join('');
-  if (otp.length !== 6) {
-    const alert = document.getElementById('otpAlert');
-    alert.className = 'alert alert-error show';
-    alert.textContent = 'Inserisci tutte le 6 cifre.';
-    return;
-  }
-
-  const alert = document.getElementById('otpAlert');
+  const alert = document.getElementById('regAlert');
   alert.className = 'alert';
   alert.textContent = '';
   alert.classList.remove('show');
 
+  if (!nome) {
+    alert.className = 'alert alert-error show'; alert.textContent = 'Inserisci il nome.'; return;
+  }
+  if (!email) {
+    alert.className = 'alert alert-error show'; alert.textContent = 'Inserisci l\'email.'; return;
+  }
+  if (password.length < 6) {
+    alert.className = 'alert alert-error show'; alert.textContent = 'Password: minimo 6 caratteri.'; return;
+  }
+  if (password !== password_confirm) {
+    alert.className = 'alert alert-error show'; alert.textContent = 'Le password non coincidono.'; return;
+  }
+
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true;
+  btn.textContent = 'Registrazione...';
+
   try {
-    const res = await fetch(`${API_URL}/verify-otp`, {
+    const res = await fetch(`${API_URL}/register`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({email: AUTH_EMAIL, otp})
+      body: JSON.stringify({nome, email, password, password_confirm})
     });
     const data = await res.json();
 
     if (data.success) {
       TOKEN = data.token;
       localStorage.setItem('fatturalens_token', TOKEN);
-      loadDashboard();
+      // Build user object from register response + defaults
+      USER = { email, nome: data.nome, piano: 'free', fatture_processate_mese: 0, limite_mensile: 5 };
+      enterDashboard(USER);
     } else {
       alert.className = 'alert alert-error show';
-      alert.textContent = data.error || 'Codice non valido.';
-      // Clear OTP inputs
-      document.querySelectorAll('.otp-digit').forEach(el => el.value = '');
-      document.querySelector('.otp-digit').focus();
+      alert.textContent = data.error || 'Errore durante la registrazione.';
     }
   } catch(e) {
     alert.className = 'alert alert-error show';
     alert.textContent = 'Errore di connessione.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Registrati';
   }
 }
 
-function backToEmail() {
-  document.getElementById('authStepOtp').style.display = 'none';
-  document.getElementById('authStepEmail').style.display = 'block';
-  document.getElementById('authEmail').focus();
+// ============ DASHBOARD ============
+function enterDashboard(user, storico) {
+  USER = user;
+  document.getElementById('sectionAuth').classList.remove('show');
+  document.getElementById('sectionDashboard').classList.add('show');
+  document.getElementById('headerInfo').style.display = 'flex';
+  document.getElementById('userEmail').textContent = user.email;
+  const badge = document.getElementById('userBadge');
+  badge.textContent = user.piano.toUpperCase();
+  badge.className = 'badge badge-' + user.piano;
+  document.getElementById('userCounter').textContent =
+    `${user.fatture_processate_mese}/${user.limite_mensile} fatture questo mese`;
+  if (user.piano === 'free') {
+    document.getElementById('bannerCount').textContent =
+      `${user.fatture_processate_mese}/${user.limite_mensile}`;
+    document.getElementById('paymentBanner').classList.add('show');
+  }
+  if (storico) renderStorico(storico);
 }
 
-// ============ DASHBOARD ============
 async function loadDashboard() {
   try {
     const res = await fetch(`${API_URL}/dashboard?token=${TOKEN}`);
     const data = await res.json();
-
     if (!data.success) {
       localStorage.removeItem('fatturalens_token');
       showAuth();
       return;
     }
-
-    USER = data.user;
-
-    document.getElementById('sectionAuth').classList.remove('show');
-    document.getElementById('sectionDashboard').classList.add('show');
-    document.getElementById('headerInfo').style.display = 'flex';
-
-    document.getElementById('userEmail').textContent = USER.email;
-    const badge = document.getElementById('userBadge');
-    badge.textContent = USER.piano.toUpperCase();
-    badge.className = 'badge badge-' + USER.piano;
-
-    document.getElementById('userCounter').textContent =
-      `${USER.fatture_processate_mese}/${USER.limite_mensile} fatture questo mese`;
-
-    if (USER.piano === 'free') {
-      document.getElementById('bannerCount').textContent =
-        `${USER.fatture_processate_mese}/${USER.limite_mensile}`;
-      document.getElementById('paymentBanner').classList.add('show');
-    }
-
-    renderStorico(data.storico || []);
-
+    enterDashboard(data.user, data.storico || []);
   } catch(e) {
     localStorage.removeItem('fatturalens_token');
     showAuth();

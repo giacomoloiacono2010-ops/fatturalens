@@ -15,6 +15,7 @@ from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import pdfplumber
 import stripe
@@ -73,6 +74,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS utenti (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
+            nome TEXT DEFAULT '',
+            password_hash TEXT,
             token TEXT,
             otp_code TEXT,
             otp_expires_at TEXT,
@@ -329,83 +332,89 @@ def generate_excel(invoice_data_list, excel_path):
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    email = (data.get('email', '') if data else '').strip().lower()
+    if not data:
+        return jsonify({'success': False, 'error': 'Dati richiesti'}), 400
+
+    nome = (data.get('nome', '') or '').strip()
+    email = (data.get('email', '') or '').strip().lower()
+    password = data.get('password', '') or ''
+    password_confirm = data.get('password_confirm', '') or ''
+
+    if not nome:
+        return jsonify({'success': False, 'error': 'Nome richiesto'}), 400
     if not email:
         return jsonify({'success': False, 'error': 'Email richiesta'}), 400
+    if len(password) < 6:
+        return jsonify({'success': False, 'error': 'Password: minimo 6 caratteri'}), 400
+    if password != password_confirm:
+        return jsonify({'success': False, 'error': 'Le password non coincidono'}), 400
 
     conn = get_db()
-    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
-    if user:
+    existing = conn.execute("SELECT id FROM utenti WHERE email = ?", (email,)).fetchone()
+    if existing:
         conn.close()
-        return jsonify({'success': False, 'error': 'Email già registrata. Accedi invece.'}), 409
+        return jsonify({'success': False, 'error': 'Email già registrata'}), 409
 
+    pw_hash = generate_password_hash(password)
     conn.execute(
-        "INSERT INTO utenti (email, piano, limite_mensile) VALUES (?, 'free', 5)",
-        (email,)
+        "INSERT INTO utenti (nome, email, password_hash, piano, limite_mensile) VALUES (?, ?, ?, 'free', 5)",
+        (nome, email, pw_hash)
     )
     conn.commit()
-    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
 
-    otp = generate_otp()
-    store_otp(conn, user['id'], otp)
-    email_sent = send_otp_email(email, otp)
+    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
+    token = str(uuid.uuid4())
+    conn.execute("UPDATE utenti SET token = ? WHERE id = ?", (token, user['id']))
+    conn.commit()
     conn.close()
 
-    logger.info(f"REGISTER|{email}|otp={otp}")
-    print(f"\n===== OTP per {email}: {otp} =====\n")
+    logger.info(f"REGISTER|{email}|{nome}")
+    return jsonify({'success': True, 'token': token, 'nome': nome})
 
-    return jsonify({
-        'success': True,
-        'message': 'Codice di verifica inviato.',
-        'otp_sent': email_sent,
-        'dev_otp': otp
-    })
 
-@app.route('/login-send-otp', methods=['POST'])
-def login_send_otp():
+@app.route('/login', methods=['POST'])
+def login():
     data = request.get_json()
-    email = (data.get('email', '') if data else '').strip().lower()
-    if not email:
-        return jsonify({'success': False, 'error': 'Email richiesta'}), 400
+    if not data:
+        return jsonify({'success': False, 'error': 'Dati richiesti'}), 400
+
+    email = (data.get('email', '') or '').strip().lower()
+    password = data.get('password', '') or ''
+
+    if not email or not password:
+        return jsonify({'success': False, 'error': 'Email e password richieste'}), 400
 
     conn = get_db()
     user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
-    if user is None:
+    if user is None or not user['password_hash']:
         conn.close()
-        return jsonify({'success': False, 'error': 'Nessun account con questa email.'}), 404
+        return jsonify({'success': False, 'error': 'Email o password errate'}), 401
 
-    otp = generate_otp()
-    store_otp(conn, user['id'], otp)
-    email_sent = send_otp_email(email, otp)
+    if not check_password_hash(user['password_hash'], password):
+        conn.close()
+        return jsonify({'success': False, 'error': 'Email o password errate'}), 401
+
+    token = str(uuid.uuid4())
+    conn.execute("UPDATE utenti SET token = ? WHERE id = ?", (token, user['id']))
+    conn.commit()
+
+    user = conn.execute("SELECT id, email, nome, piano, fatture_processate_mese, limite_mensile, created_at FROM utenti WHERE id = ?", (user['id'],)).fetchone()
     conn.close()
 
-    logger.info(f"LOGIN_OTP|{email}|otp={otp}")
-    print(f"\n===== OTP per {email}: {otp} =====\n")
-
+    logger.info(f"LOGIN|{email}")
     return jsonify({
         'success': True,
-        'message': 'Codice di verifica inviato.',
-        'otp_sent': email_sent,
-        'dev_otp': otp
+        'token': token,
+        'user': {
+            'email': user['email'],
+            'nome': user['nome'],
+            'piano': user['piano'],
+            'fatture_processate_mese': user['fatture_processate_mese'],
+            'limite_mensile': user['limite_mensile'],
+            'iscritto_dal': user['created_at']
+        }
     })
 
-@app.route('/verify-otp', methods=['POST'])
-def verify_otp_route():
-    data = request.get_json()
-    email = (data.get('email', '') if data else '').strip().lower()
-    otp = (data.get('otp', '') if data else '').strip()
-    if not email or not otp:
-        return jsonify({'success': False, 'error': 'Email e codice richiesti'}), 400
-
-    conn = get_db()
-    token = verify_otp(conn, email, otp)
-    conn.close()
-
-    if token is None:
-        return jsonify({'success': False, 'error': 'Codice non valido o scaduto.'}), 401
-
-    logger.info(f"VERIFY|{email}|token={token[:8]}...")
-    return jsonify({'success': True, 'token': token})
 
 # ---- ROUTES: APP ----
 @app.route('/upload', methods=['POST'])
