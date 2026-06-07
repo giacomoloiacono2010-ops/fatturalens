@@ -2,6 +2,7 @@ import os
 import re
 import json
 import uuid
+import random
 import sqlite3
 import shutil
 import time
@@ -73,6 +74,8 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             email TEXT UNIQUE NOT NULL,
             token TEXT,
+            otp_code TEXT,
+            otp_expires_at TEXT,
             piano TEXT DEFAULT 'free',
             limite_mensile INTEGER DEFAULT 5,
             fatture_processate_mese INTEGER DEFAULT 0,
@@ -116,7 +119,6 @@ def do_backup():
         if not os.path.exists(backup_path):
             shutil.copy2(DB_PATH, backup_path)
             logger.info(f"BACKUP|created {backup_path}")
-        # Keep only last 7
         backups = sorted(
             [f for f in os.listdir(BACKUP_FOLDER) if f.startswith('fatturalens_') and f.endswith('.db')],
             reverse=True
@@ -139,6 +141,64 @@ def backup_daemon():
 
 t = threading.Thread(target=backup_daemon, daemon=True)
 t.start()
+
+# ---- OTP HELPERS ----
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+def send_otp_email(email, otp):
+    if not RESEND_API_KEY:
+        return False
+    try:
+        requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {RESEND_API_KEY}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'from': 'FatturaLens <onboarding@resend.dev>',
+                'to': email,
+                'subject': 'Il tuo codice FatturaLens',
+                'html': f'''
+                    <div style="font-family:Arial,sans-serif;max-width:480px;margin:32px auto;padding:32px">
+                        <h2 style="color:#1e3a5f;">Ecco il tuo codice</h2>
+                        <div style="background:#f5f2eb;border-radius:8px;padding:20px;text-align:center;margin:16px 0">
+                            <span style="font-size:36px;font-weight:bold;letter-spacing:6px;color:#0a0a0a">{otp}</span>
+                        </div>
+                        <p style="color:#666;">Valido per 10 minuti. Non condividere questo codice con nessuno.</p>
+                    </div>
+                '''
+            },
+            timeout=15
+        )
+        return True
+    except Exception:
+        return False
+
+def store_otp(conn, user_id, otp):
+    expires = (datetime.utcnow() + timedelta(minutes=10)).strftime('%Y-%m-%d %H:%M:%S')
+    conn.execute(
+        "UPDATE utenti SET otp_code = ?, otp_expires_at = ? WHERE id = ?",
+        (otp, expires, user_id)
+    )
+    conn.commit()
+
+def verify_otp(conn, email, otp):
+    user = conn.execute(
+        "SELECT * FROM utenti WHERE email = ? AND otp_code = ? AND otp_expires_at > datetime('now')",
+        (email, otp)
+    ).fetchone()
+    if user is None:
+        return None
+    # Clear OTP after successful verification
+    token = str(uuid.uuid4())
+    conn.execute(
+        "UPDATE utenti SET token = ?, otp_code = NULL, otp_expires_at = NULL WHERE id = ?",
+        (token, user['id'])
+    )
+    conn.commit()
+    return token
 
 # ---- HELPERS ----
 def get_or_create_user(email):
@@ -189,13 +249,9 @@ def to_float(val):
 
 def postprocess_json(parsed):
     result = {}
-
-    # p_iva_fornitore: remove spaces, dots, dashes; must be 11 digits
     p_iva = str(parsed.get('p_iva_fornitore', '') or '')
     p_iva = re.sub(r'[\s.\-]', '', p_iva)
     result['p_iva_fornitore'] = p_iva if re.match(r'^\d{11}$', p_iva) else None
-
-    # importi: comma → dot, fallback calcolo
     imponibile = to_float(parsed.get('imponibile'))
     importo_iva = to_float(parsed.get('importo_iva'))
     totale = parsed.get('totale_fattura')
@@ -208,8 +264,6 @@ def postprocess_json(parsed):
     result['imponibile'] = imponibile
     result['importo_iva'] = importo_iva
     result['totale_fattura'] = totale
-
-    # data_emissione: DD/MM/YYYY or DD-MM-YYYY → YYYY-MM-DD
     data = str(parsed.get('data_emissione', '') or '').strip()
     m = re.match(r'^(\d{2})[/-](\d{2})[/-](\d{4})$', data)
     if m:
@@ -217,14 +271,9 @@ def postprocess_json(parsed):
     elif not re.match(r'^\d{4}-\d{2}-\d{2}$', data):
         data = None
     result['data_emissione'] = data
-
-    # nome_fornitore: remove multiple spaces
     nome = str(parsed.get('nome_fornitore', '') or '').strip()
     result['nome_fornitore'] = re.sub(r'\s+', ' ', nome)
-
-    # numero_fattura: as-is
     result['numero_fattura'] = str(parsed.get('numero_fattura', '') or '')
-
     return result
 
 def call_openrouter(prompt_text, temperature=0.1):
@@ -276,7 +325,89 @@ def generate_excel(invoice_data_list, excel_path):
     ])
     df.to_excel(excel_path, index=False, engine='openpyxl')
 
-# ---- ROUTES ----
+# ---- ROUTES: AUTH ----
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = (data.get('email', '') if data else '').strip().lower()
+    if not email:
+        return jsonify({'success': False, 'error': 'Email richiesta'}), 400
+
+    conn = get_db()
+    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
+    if user:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Email già registrata. Accedi invece.'}), 409
+
+    conn.execute(
+        "INSERT INTO utenti (email, piano, limite_mensile) VALUES (?, 'free', 5)",
+        (email,)
+    )
+    conn.commit()
+    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
+
+    otp = generate_otp()
+    store_otp(conn, user['id'], otp)
+    email_sent = send_otp_email(email, otp)
+    conn.close()
+
+    logger.info(f"REGISTER|{email}|otp={otp}")
+    print(f"\n===== OTP per {email}: {otp} =====\n")
+
+    return jsonify({
+        'success': True,
+        'message': 'Codice di verifica inviato.',
+        'otp_sent': email_sent,
+        'dev_otp': otp
+    })
+
+@app.route('/login-send-otp', methods=['POST'])
+def login_send_otp():
+    data = request.get_json()
+    email = (data.get('email', '') if data else '').strip().lower()
+    if not email:
+        return jsonify({'success': False, 'error': 'Email richiesta'}), 400
+
+    conn = get_db()
+    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
+    if user is None:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Nessun account con questa email.'}), 404
+
+    otp = generate_otp()
+    store_otp(conn, user['id'], otp)
+    email_sent = send_otp_email(email, otp)
+    conn.close()
+
+    logger.info(f"LOGIN_OTP|{email}|otp={otp}")
+    print(f"\n===== OTP per {email}: {otp} =====\n")
+
+    return jsonify({
+        'success': True,
+        'message': 'Codice di verifica inviato.',
+        'otp_sent': email_sent,
+        'dev_otp': otp
+    })
+
+@app.route('/verify-otp', methods=['POST'])
+def verify_otp_route():
+    data = request.get_json()
+    email = (data.get('email', '') if data else '').strip().lower()
+    otp = (data.get('otp', '') if data else '').strip()
+    if not email or not otp:
+        return jsonify({'success': False, 'error': 'Email e codice richiesti'}), 400
+
+    conn = get_db()
+    token = verify_otp(conn, email, otp)
+    conn.close()
+
+    if token is None:
+        return jsonify({'success': False, 'error': 'Codice non valido o scaduto.'}), 401
+
+    logger.info(f"VERIFY|{email}|token={token[:8]}...")
+    return jsonify({'success': True, 'token': token})
+
+# ---- ROUTES: APP ----
 @app.route('/upload', methods=['POST'])
 @limiter.limit("10 per minute")
 def upload():
@@ -295,16 +426,11 @@ def upload():
 
     user = get_or_create_user(email)
 
-    # Monthly limit check
     if user['fatture_processate_mese'] >= user['limite_mensile']:
         os.remove(pdf_path)
         logger.warning(f"UPLOAD|{email}|{pdf_filename}|monthly_limit_exceeded")
-        return jsonify({
-            'success': False,
-            'error': 'Limite esaurito. Passa a Base o Pro.'
-        }), 403
+        return jsonify({'success': False, 'error': 'Limite esaurito. Passa a Base o Pro.'}), 403
 
-    # Pro daily limit check (500/day)
     conn_check = get_db()
     if user['piano'] == 'pro':
         today_str = date.today().isoformat()
@@ -316,29 +442,17 @@ def upload():
             conn_check.close()
             os.remove(pdf_path)
             logger.warning(f"UPLOAD|{email}|{pdf_filename}|daily_limit_exceeded_pro")
-            return jsonify({
-                'success': False,
-                'error': 'Hai raggiunto il limite giornaliero di 500 fatture.'
-            }), 429
+            return jsonify({'success': False, 'error': 'Hai raggiunto il limite giornaliero di 500 fatture.'}), 429
     conn_check.close()
 
-    # Extract text from PDF
     pdf_text = extract_pdf_text(pdf_path)
     if pdf_text is None or pdf_text == '':
         os.remove(pdf_path)
         logger.warning(f"UPLOAD|{email}|{pdf_filename}|no_text_extracted")
-        # Check if it might be a scanned PDF
         if pdf_text is None:
-            return jsonify({
-                'success': False,
-                'error': 'Impossibile leggere il PDF. File corrotto o formato non supportato.'
-            }), 422
-        return jsonify({
-            'success': False,
-            'error': 'PDF senza testo estraibile. Carica un PDF con testo selezionabile.'
-        }), 422
+            return jsonify({'success': False, 'error': 'Impossibile leggere il PDF. File corrotto o formato non supportato.'}), 422
+        return jsonify({'success': False, 'error': 'PDF senza testo estraibile. Carica un PDF con testo selezionabile.'}), 422
 
-    # Try OpenRouter: first attempt t=0.1, second t=0
     parsed = None
     for attempt, temp in enumerate([0.1, 0]):
         parsed = call_openrouter(pdf_text, temperature=temp)
@@ -356,12 +470,8 @@ def upload():
             conn.close()
             os.remove(pdf_path)
             logger.error(f"UPLOAD|{email}|{pdf_filename}|json_parse_failed")
-            return jsonify({
-                'success': False,
-                'error': 'Impossibile estrarre dati strutturati dalla fattura. Riprova.'
-            }), 422
+            return jsonify({'success': False, 'error': 'Impossibile estrarre dati strutturati dalla fattura. Riprova.'}), 422
 
-        # Post-processing
         cleaned = postprocess_json(parsed)
 
         invoice_record = {
@@ -423,57 +533,6 @@ def download(invoice_id):
     if not os.path.exists(excel_path):
         return jsonify({'success': False, 'error': 'File non disponibile'}), 404
     return send_file(excel_path, as_attachment=True, download_name=f"fattura_{invoice_id}.xlsx")
-
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.get_json()
-    email = (data.get('email', '') if data else '').strip().lower()
-    if not email:
-        return jsonify({'success': False, 'error': 'Email richiesta'}), 400
-
-    conn = get_db()
-    user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
-    if user is None:
-        conn.execute("INSERT INTO utenti (email, piano, limite_mensile) VALUES (?, 'free', 5)", (email,))
-        conn.commit()
-        user = conn.execute("SELECT * FROM utenti WHERE email = ?", (email,)).fetchone()
-
-    token = str(uuid.uuid4())
-    conn.execute("UPDATE utenti SET token = ? WHERE id = ?", (token, user['id']))
-    conn.commit()
-    conn.close()
-
-    magic_link = f"{FRONTEND_URL}/dashboard?token={token}"
-    email_html = f"""
-    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-        <h2 style="color: #1e3a5f;">Benvenuto su FatturaLens</h2>
-        <p>Clicca il pulsante qui sotto per accedere:</p>
-        <a href="{magic_link}" style="display: inline-block; background: #1e3a5f; color: white; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: bold;">Accedi a FatturaLens</a>
-        <p style="margin-top: 24px; color: #666;">Oppure copia questo link nel browser:<br>{magic_link}</p>
-    </div>
-    """
-
-    if RESEND_API_KEY:
-        try:
-            requests.post(
-                'https://api.resend.com/emails',
-                headers={
-                    'Authorization': f'Bearer {RESEND_API_KEY}',
-                    'Content-Type': 'application/json'
-                },
-                json={
-                    'from': 'FatturaLens <onboarding@resend.dev>',
-                    'to': email,
-                    'subject': 'Accedi a FatturaLens',
-                    'html': email_html
-                },
-                timeout=15
-            )
-        except Exception:
-            pass
-
-    logger.info(f"LOGIN|{email}|token_sent")
-    return jsonify({'success': True, 'message': 'Email inviata'})
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():

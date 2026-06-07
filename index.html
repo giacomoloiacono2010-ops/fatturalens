@@ -14,7 +14,6 @@ h1,h2,h3,h4{font-family:Syne,sans-serif;font-weight:700;color:#f5f2eb}
 a{color:#c8ff00;text-decoration:none}
 a:hover{text-decoration:underline}
 .container{width:100%;max-width:600px;padding:1.5rem 1rem;margin:0 auto}
-/* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem}
 .header-brand{display:flex;align-items:center;gap:.5rem}
 .header-brand h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f5f2eb,#c8ff00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -23,10 +22,8 @@ a:hover{text-decoration:underline}
 .badge-base{background:#c8ff00;color:#0a0a0a}
 .badge-pro{background:#f5f2eb;color:#0a0a0a}
 .counter{font-size:.75rem;color:#888}
-/* CARDS */
 .card{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
 .card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#666;margin-bottom:.5rem}
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.5rem;border-radius:8px;font-family:Syne,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;border:none;transition:all .15s ease;text-decoration:none}
 .btn:disabled{opacity:.5;pointer-events:none}
 .btn-primary{background:#c8ff00;color:#0a0a0a}
@@ -36,40 +33,34 @@ a:hover{text-decoration:underline}
 .btn-download{background:transparent;color:#c8ff00;border:1px solid #c8ff00;padding:.4rem 1rem;font-size:.75rem}
 .btn-download:hover{background:#c8ff00;color:#0a0a0a}
 .btn-link{background:transparent;color:#c8ff00;padding:0;font-family:'DM Mono',monospace;font-size:.85rem;text-decoration:underline}
-/* INPUTS */
 .input{width:100%;padding:.75rem 1rem;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#f5f2eb;font-family:'DM Mono',monospace;font-size:.85rem;outline:none;transition:border .15s}
 .input:focus{border-color:#c8ff00}
 .input::placeholder{color:#555}
-/* DROP ZONE */
+.otp-input{text-align:center;font-size:2rem;letter-spacing:8px;font-family:Syne,sans-serif;font-weight:700;padding:.75rem}
 .dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;min-height:200px;border:2px dashed #333;border-radius:12px;padding:2rem;cursor:pointer;transition:all .2s;text-align:center}
 .dropzone.active,.dropzone.dragover{border-color:#c8ff00;background:#1a1a1a}
 .dropzone-icon{font-size:2.5rem;line-height:1;color:#c8ff00;opacity:.6}
 .dropzone-text{color:#888;font-size:.85rem;max-width:260px}
 .dropzone-text strong{color:#c8ff00;font-weight:400}
-/* SPINNER */
 .spinner{display:none;flex-direction:column;align-items:center;gap:1rem;padding:2rem}
 .spinner.show{display:flex}
 .spinner-ring{width:36px;height:36px;border:3px solid #1a1a1a;border-top-color:#c8ff00;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner-text{color:#888;font-size:.8rem}
-/* TABLE */
 .table-wrap{overflow-x:auto;margin-top:1rem}
 table{width:100%;border-collapse:collapse;font-size:.75rem}
 th{text-align:left;padding:.6rem .4rem;color:#888;font-family:Syne,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.65rem;border-bottom:1px solid #1a1a1a}
 td{padding:.6rem .4rem;border-bottom:1px solid #1a1a1a;white-space:nowrap}
 td:last-child,th:last-child{text-align:right}
 td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
-/* ALERTS */
 .alert{padding:.9rem 1rem;border-radius:8px;font-size:.8rem;display:none;margin-bottom:1rem}
 .alert.show{display:block}
 .alert-success{background:#0f2e00;border:1px solid #c8ff00;color:#c8ff00}
 .alert-error{background:#2e0000;border:1px solid #ff4444;color:#ff6b6b}
 .alert-warning{background:#2e1f00;border:1px solid #ffa500;color:#ffa500}
 .alert-info{background:#0a1a2e;border:1px solid #4488ff;color:#88bbff}
-/* SECTIONS */
 .section{display:none}
 .section.show{display:block}
-/* STORICO */
 .storico-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.6rem 0;border-bottom:1px solid #141414;font-size:.75rem}
 .storico-item:last-child{border-bottom:none}
 .storico-file{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aaa}
@@ -77,17 +68,14 @@ td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
 .storico-status{font-size:.8rem}
 .status-ok{color:#c8ff00}
 .status-err{color:#ff4444}
-/* BANNER */
 .banner-fixed{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #1a1a1a;padding:.8rem 1rem;z-index:100;display:none}
 .banner-fixed.show{display:block}
 .banner-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
 .banner-text{font-size:.75rem;color:#888}
 .banner-text strong{color:#f5f2eb}
-/* RESULT CARD */
 .result-card{display:none}
 .result-card.show{display:block}
 .result-actions{display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap}
-/* UTILITY */
 .mt-1{margin-top:1rem}
 .mt-2{margin-top:2rem}
 .mb-1{margin-bottom:1rem}
@@ -96,7 +84,19 @@ td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
 .flex{display:flex}
 .gap-1{gap:1rem}
 .hidden{display:none!important}
-/* RESPONSIVE */
+/* TABS */
+.auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid #1a1a1a}
+.auth-tab{padding:.6rem 1.2rem;font-family:Syne,sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;color:#555;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none}
+.auth-tab.active{color:#c8ff00;border-bottom-color:#c8ff00}
+.auth-tab:hover{color:#f5f2eb}
+/* OTP */
+.otp-box{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:.5rem 0}
+.otp-box p{color:#888;font-size:.8rem;text-align:center}
+.otp-row{display:flex;gap:.5rem;justify-content:center}
+.otp-digit{width:48px;height:56px;background:#1a1a1a;border:1px solid #333;border-radius:8px;text-align:center;font-family:Syne,sans-serif;font-size:1.5rem;font-weight:700;color:#f5f2eb;outline:none;transition:border .15s}
+.otp-digit:focus{border-color:#c8ff00}
+.otp-timer{color:#555;font-size:.7rem}
+.user-email-display{font-size:.75rem;color:#888;margin-bottom:.5rem}
 @media(max-width:480px){
 .container{padding:1rem .75rem}
 .header-brand h1{font-size:1.2rem}
@@ -104,6 +104,7 @@ td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
 .dropzone{min-height:160px;padding:1.5rem}
 .btn{font-size:.8rem;padding:.6rem 1.2rem}
 table{font-size:.7rem}
+.otp-digit{width:40px;height:48px;font-size:1.2rem}
 }
 </style>
 </head>
@@ -116,33 +117,58 @@ table{font-size:.7rem}
     <div class="header-brand">
       <h1>FatturaLens</h1>
     </div>
-    <div id="headerInfo" style="display:none;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+    <div id="headerInfo" style="display:none;align-items:center;gap:.5rem;flex-wrap:wrap">
       <span id="userEmail" style="font-size:.7rem;color:#666"></span>
       <span id="userBadge" class="badge"></span>
       <span id="userCounter" class="counter"></span>
     </div>
   </header>
 
-  <!-- SECTION: LOGIN -->
-  <div id="sectionLogin" class="section show">
-    <div class="card">
-      <h2 style="font-size:1.2rem;margin-bottom:.5rem">Accedi o Registrati</h2>
-      <p class="text-muted mb-1">Inserisci la tua email per ricevere un link magico.</p>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-        <input id="loginEmail" class="input" type="email" placeholder="tua@email.it" style="flex:1;min-width:180px">
-        <button id="loginBtn" class="btn btn-primary" onclick="login()">Accedi / Registrati</button>
+  <!-- SECTION: AUTH -->
+  <div id="sectionAuth" class="section show">
+    <div class="card" style="border-color:#1a1a1a">
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Accedi</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Registrati</button>
       </div>
-      <div id="loginAlert" class="alert mt-1"></div>
-    </div>
-    <div class="card text-center" style="padding:1rem">
-      <p class="text-muted" style="font-size:.7rem">Piano Free: 5 fatture/mese &middot; Base: 100 fatture/mese &middot; Pro: illimitate</p>
+
+      <!-- Step 1: Email -->
+      <div id="authStepEmail">
+        <div id="authAlert" class="alert"></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <input id="authEmail" class="input" type="email" placeholder="tua@email.it" style="flex:1;min-width:180px" onkeydown="if(event.key==='Enter')sendAuth()">
+          <button id="authBtn" class="btn btn-primary" onclick="sendAuth()">Invia codice</button>
+        </div>
+        <p id="authModeText" class="text-muted mt-1">Riceverai un codice OTP via email.</p>
+      </div>
+
+      <!-- Step 2: OTP -->
+      <div id="authStepOtp" style="display:none">
+        <div class="otp-box">
+          <div class="user-email-display" id="otpEmailDisplay"></div>
+          <p>Inserisci il codice a 6 cifre</p>
+          <div class="otp-row">
+            <input class="otp-digit" maxlength="1" data-index="0" oninput="otpDigitInput(this)">
+            <input class="otp-digit" maxlength="1" data-index="1" oninput="otpDigitInput(this)">
+            <input class="otp-digit" maxlength="1" data-index="2" oninput="otpDigitInput(this)">
+            <input class="otp-digit" maxlength="1" data-index="3" oninput="otpDigitInput(this)">
+            <input class="otp-digit" maxlength="1" data-index="4" oninput="otpDigitInput(this)">
+            <input class="otp-digit" maxlength="1" data-index="5" oninput="otpDigitInput(this)">
+          </div>
+          <span class="otp-timer" id="otpTimer">Codice valido per 10 minuti</span>
+          <div style="display:flex;gap:.5rem;margin-top:.5rem">
+            <button class="btn btn-primary" onclick="verifyOtp()">Verifica</button>
+            <button class="btn btn-outline" onclick="backToEmail()">Cambia email</button>
+          </div>
+          <div id="otpAlert" class="alert" style="width:100%"></div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- SECTION: DASHBOARD -->
   <div id="sectionDashboard" class="section">
-
-    <!-- UPLOAD -->
     <div class="card">
       <div class="card-label">Carica fattura</div>
       <div id="dropzone" class="dropzone" onclick="document.getElementById('fileInput').click()">
@@ -150,17 +176,11 @@ table{font-size:.7rem}
         <div class="dropzone-text">Trascina qui il PDF <strong>o clicca per selezionare</strong></div>
       </div>
       <input id="fileInput" type="file" accept=".pdf" style="display:none" onchange="handleFileSelect(event)">
-
-      <!-- SPINNER -->
       <div id="spinner" class="spinner">
         <div class="spinner-ring"></div>
         <div class="spinner-text">Estrazione dati in corso...</div>
       </div>
-
-      <!-- ALERTS -->
       <div id="uploadAlert" class="alert"></div>
-
-      <!-- RESULT -->
       <div id="resultCard" class="card result-card mt-1" style="margin-bottom:0">
         <div class="card-label">Anteprima fattura</div>
         <div class="table-wrap">
@@ -176,15 +196,12 @@ table{font-size:.7rem}
         </div>
       </div>
     </div>
-
-    <!-- STORICO -->
     <div class="card">
       <div class="card-label">Storico ultimi upload</div>
       <div id="storicoList">
         <p class="text-muted" style="font-size:.75rem">Carica la prima fattura per vedere lo storico.</p>
       </div>
     </div>
-
   </div>
 
 </div>
@@ -198,84 +215,169 @@ table{font-size:.7rem}
 </div>
 
 <script>
-// ============ CONFIG ============
 const API_URL = window.location.origin;
 let TOKEN = '';
 let USER = null;
+let AUTH_EMAIL = '';
+let AUTH_MODE = 'login'; // 'login' or 'register'
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  TOKEN = params.get('token') || localStorage.getItem('fatturalens_token') || '';
-
-  if (TOKEN) {
-    localStorage.setItem('fatturalens_token', TOKEN);
-    loadDashboard();
-  }
+  TOKEN = localStorage.getItem('fatturalens_token') || '';
+  if (TOKEN) loadDashboard();
 });
 
-// ============ LOGIN ============
-async function login() {
-  const email = document.getElementById('loginEmail').value.trim();
+// ============ AUTH TABS ============
+function switchAuthTab(mode) {
+  AUTH_MODE = mode;
+  document.getElementById('tabLogin').className = 'auth-tab' + (mode==='login' ? ' active' : '');
+  document.getElementById('tabRegister').className = 'auth-tab' + (mode==='register' ? ' active' : '');
+  document.getElementById('authModeText').textContent = mode==='login'
+    ? 'Riceverai un codice OTP per accedere.'
+    : 'Riceverai un codice OTP per confermare la registrazione.';
+  const btn = document.getElementById('authBtn');
+  btn.textContent = 'Invia codice';
+  document.getElementById('authAlert').className = 'alert';
+  document.getElementById('authAlert').classList.remove('show');
+}
+
+// ============ SEND OTP ============
+async function sendAuth() {
+  const email = document.getElementById('authEmail').value.trim();
   if (!email) return;
 
-  const btn = document.getElementById('loginBtn');
+  AUTH_EMAIL = email;
+  const btn = document.getElementById('authBtn');
   btn.disabled = true;
   btn.textContent = 'Invio...';
 
-  const alert = document.getElementById('loginAlert');
+  const alert = document.getElementById('authAlert');
   alert.className = 'alert';
   alert.textContent = '';
   alert.classList.remove('show');
 
+  const endpoint = AUTH_MODE === 'register' ? '/register' : '/login-send-otp';
+
   try {
-    const res = await fetch(`${API_URL}/login`, {
+    const res = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({email})
     });
     const data = await res.json();
+
     if (data.success) {
-      alert.className = 'alert alert-success show';
-      alert.textContent = 'Controlla la tua email per il link magico.';
-      document.getElementById('loginEmail').value = '';
+      // Switch to OTP step
+      document.getElementById('authStepEmail').style.display = 'none';
+      document.getElementById('authStepOtp').style.display = 'block';
+      document.getElementById('otpEmailDisplay').textContent = email;
+
+      // In development, show OTP in alert
+      if (data.dev_otp) {
+        alert.className = 'alert alert-info show';
+        alert.innerHTML = 'Modalità sviluppo: il tuo codice è <strong>' + data.dev_otp + '</strong>';
+      }
+
+      // Focus first digit
+      document.querySelector('.otp-digit').focus();
+
+      // Reset OTP inputs
+      document.querySelectorAll('.otp-digit').forEach(el => el.value = '');
     } else {
       alert.className = 'alert alert-error show';
-      alert.textContent = data.error || 'Errore durante il login.';
+      alert.textContent = data.error || 'Errore durante l\'invio del codice.';
     }
   } catch(e) {
     alert.className = 'alert alert-error show';
     alert.textContent = 'Errore di connessione al server.';
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Accedi / Registrati';
+    btn.textContent = 'Invia codice';
   }
 }
 
-// ============ DASHBOARD ============
-async function loadDashboard() {
-  const alert = document.getElementById('loginAlert');
+// ============ OTP INPUT ============
+function otpDigitInput(el) {
+  const idx = parseInt(el.dataset.index);
+  el.value = el.value.replace(/[^0-9]/g, '').slice(0,1);
+  if (el.value && idx < 5) {
+    document.querySelector(`.otp-digit[data-index="${idx+1}"]`).focus();
+  }
+  // If last digit, auto-verify after short delay
+  if (idx === 5 && el.value) {
+    setTimeout(verifyOtp, 300);
+  }
+  // Clear error on typing
+  document.getElementById('otpAlert').className = 'alert';
+  document.getElementById('otpAlert').classList.remove('show');
+}
+
+// ============ VERIFY OTP ============
+async function verifyOtp() {
+  const digits = [];
+  document.querySelectorAll('.otp-digit').forEach(el => digits.push(el.value));
+  const otp = digits.join('');
+  if (otp.length !== 6) {
+    const alert = document.getElementById('otpAlert');
+    alert.className = 'alert alert-error show';
+    alert.textContent = 'Inserisci tutte le 6 cifre.';
+    return;
+  }
+
+  const alert = document.getElementById('otpAlert');
   alert.className = 'alert';
   alert.textContent = '';
   alert.classList.remove('show');
 
+  try {
+    const res = await fetch(`${API_URL}/verify-otp`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email: AUTH_EMAIL, otp})
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      TOKEN = data.token;
+      localStorage.setItem('fatturalens_token', TOKEN);
+      loadDashboard();
+    } else {
+      alert.className = 'alert alert-error show';
+      alert.textContent = data.error || 'Codice non valido.';
+      // Clear OTP inputs
+      document.querySelectorAll('.otp-digit').forEach(el => el.value = '');
+      document.querySelector('.otp-digit').focus();
+    }
+  } catch(e) {
+    alert.className = 'alert alert-error show';
+    alert.textContent = 'Errore di connessione.';
+  }
+}
+
+function backToEmail() {
+  document.getElementById('authStepOtp').style.display = 'none';
+  document.getElementById('authStepEmail').style.display = 'block';
+  document.getElementById('authEmail').focus();
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard() {
   try {
     const res = await fetch(`${API_URL}/dashboard?token=${TOKEN}`);
     const data = await res.json();
 
     if (!data.success) {
       localStorage.removeItem('fatturalens_token');
-      showLogin();
+      showAuth();
       return;
     }
 
     USER = data.user;
 
-    // Switch sections
-    document.getElementById('sectionLogin').classList.remove('show');
+    document.getElementById('sectionAuth').classList.remove('show');
     document.getElementById('sectionDashboard').classList.add('show');
+    document.getElementById('headerInfo').style.display = 'flex';
 
-    // Header info
     document.getElementById('userEmail').textContent = USER.email;
     const badge = document.getElementById('userBadge');
     badge.textContent = USER.piano.toUpperCase();
@@ -284,25 +386,25 @@ async function loadDashboard() {
     document.getElementById('userCounter').textContent =
       `${USER.fatture_processate_mese}/${USER.limite_mensile} fatture questo mese`;
 
-    // Payment banner
     if (USER.piano === 'free') {
       document.getElementById('bannerCount').textContent =
         `${USER.fatture_processate_mese}/${USER.limite_mensile}`;
       document.getElementById('paymentBanner').classList.add('show');
     }
 
-    // Storico
     renderStorico(data.storico || []);
 
   } catch(e) {
     localStorage.removeItem('fatturalens_token');
-    showLogin();
+    showAuth();
   }
 }
 
-function showLogin() {
+function showAuth() {
   document.getElementById('sectionDashboard').classList.remove('show');
-  document.getElementById('sectionLogin').classList.add('show');
+  document.getElementById('headerInfo').style.display = 'none';
+  document.getElementById('paymentBanner').classList.remove('show');
+  document.getElementById('sectionAuth').classList.add('show');
 }
 
 // ============ UPLOAD ============
@@ -311,7 +413,6 @@ function handleFileSelect(e) {
   if (file) uploadFile(file);
 }
 
-// Drag & Drop
 const dropzone = document.getElementById('dropzone');
 dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
 dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
@@ -319,20 +420,10 @@ dropzone.addEventListener('drop', (e) => {
   e.preventDefault();
   dropzone.classList.remove('dragover');
   const file = e.dataTransfer.files[0];
-  if (file && file.type === 'application/pdf') {
-    uploadFile(file);
-  }
-});
-// Also handle paste
-document.addEventListener('paste', (e) => {
-  const file = e.clipboardData.files[0];
-  if (file && file.type === 'application/pdf' && document.getElementById('sectionDashboard').classList.contains('show')) {
-    uploadFile(file);
-  }
+  if (file && file.type === 'application/pdf') uploadFile(file);
 });
 
 async function uploadFile(file) {
-  // Reset UI
   const alert = document.getElementById('uploadAlert');
   alert.className = 'alert';
   alert.textContent = '';
@@ -347,33 +438,25 @@ async function uploadFile(file) {
     fd.append('file', file);
     fd.append('email', USER.email);
 
-    const res = await fetch(`${API_URL}/upload`, {
-      method: 'POST',
-      body: fd
-    });
-
+    const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: fd });
     const data = await res.json();
 
     if (res.status === 403) {
-      // Limite esaurito
       alert.className = 'alert alert-error show';
       alert.innerHTML = 'Hai esaurito le fatture del piano Free. Passa a Base (29€) o Pro (49€).';
       return;
     }
-
     if (res.status === 422 || !data.success) {
       alert.className = 'alert alert-error show';
       alert.innerHTML = 'Impossibile leggere questa fattura. Riprova o contatta supporto.';
       return;
     }
-
     if (!data.success) {
       alert.className = 'alert alert-error show';
       alert.textContent = data.error || 'Errore durante l\'elaborazione.';
       return;
     }
 
-    // Success — show preview
     document.getElementById('resultCard').classList.add('show');
     const tbody = document.getElementById('resultBody');
     const r = data.data;
@@ -386,16 +469,12 @@ async function uploadFile(file) {
       <td><span class="amount">${fmtEuro(r.IVA)}</span></td>
       <td><span class="amount">${fmtEuro(r.Totale)}</span></td>
     </tr>`;
-
-    const dlBtn = document.getElementById('downloadBtn');
-    dlBtn.href = `${API_URL}${data.excel_url}`;
-
-    // Refresh dashboard counters
+    document.getElementById('downloadBtn').href = `${API_URL}${data.excel_url}`;
     await loadDashboard();
 
   } catch(e) {
     alert.className = 'alert alert-error show';
-    alert.textContent = 'Errore di connessione al server.';
+    alert.textContent = 'Errore di connessione.';
   } finally {
     document.getElementById('spinner').classList.remove('show');
     dropzone.style.display = 'flex';
@@ -413,11 +492,7 @@ function renderStorico(list) {
   list.slice(0,10).forEach(item => {
     const ok = item.status === 'done';
     let data = '';
-    try {
-      const j = JSON.parse(item.data);
-      data = j.data_emissione || '';
-    } catch(e) {}
-
+    try { const j = JSON.parse(item.data); data = j.data_emissione || ''; } catch(e) {}
     const file = item.file || 'fattura.pdf';
     const date = item.created_at ? item.created_at.slice(0,10) : '';
     html += `<div class="storico-item">
@@ -432,9 +507,9 @@ function renderStorico(list) {
 
 // ============ UTILS ============
 function fmtEuro(n) {
-  if (n === null || n === undefined || n === '') return '—';
+  if (n === null || n === undefined || n === '') return '&mdash;';
   const num = parseFloat(n);
-  if (isNaN(num)) return '—';
+  if (isNaN(num)) return '&mdash;';
   return '€ ' + num.toFixed(2).replace('.', ',');
 }
 </script>
