@@ -10,7 +10,7 @@ import threading
 from logging.handlers import RotatingFileHandler
 from datetime import datetime, date, timedelta
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -583,6 +583,18 @@ def stripe_webhook():
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'timestamp': datetime.utcnow().isoformat()})
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204
+
+@app.route('/')
+def serve_landing():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'landing.html')
+
+@app.route('/app')
+def serve_app():
+    return send_from_directory(os.path.dirname(os.path.abspath(__file__)), 'index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=True)
