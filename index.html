@@ -3,474 +3,360 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FatturaLens</title>
+<title>FatturaLens — Accedi o registrati</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital@0;1&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{font-size:16px;scroll-behavior:smooth}
-body{background:#0a0a0a;color:#f5f2eb;font-family:'DM Mono',monospace;min-height:100vh;padding:1rem;display:flex;flex-direction:column;align-items:center}
-h1,h2,h3,h4{font-family:Syne,sans-serif;font-weight:700;color:#f5f2eb}
-a{color:#c8ff00;text-decoration:none}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,sans-serif;background:#f8f9fa;color:#1a1a2e;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+a{color:#2563eb;text-decoration:none;font-weight:500}
 a:hover{text-decoration:underline}
-.container{width:100%;max-width:600px;padding:1.5rem 1rem;margin:0 auto}
-.header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem}
-.header-brand{display:flex;align-items:center;gap:.5rem}
-.header-brand h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f5f2eb,#c8ff00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.badge{font-size:.65rem;padding:.2rem .6rem;border-radius:999px;font-family:Syne,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.badge-free{background:#1a1a1a;color:#f5f2eb;border:1px solid #333}
-.badge-base{background:#c8ff00;color:#0a0a0a}
-.badge-pro{background:#f5f2eb;color:#0a0a0a}
-.counter{font-size:.75rem;color:#888}
-.card{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
-.card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#666;margin-bottom:.5rem}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.5rem;border-radius:8px;font-family:Syne,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;border:none;transition:all .15s ease;text-decoration:none}
-.btn:disabled{opacity:.5;pointer-events:none}
-.btn-primary{background:#c8ff00;color:#0a0a0a}
-.btn-primary:hover{background:#b8ee00;transform:translateY(-1px)}
-.btn-outline{background:transparent;color:#f5f2eb;border:1px solid #333}
-.btn-outline:hover{background:#1a1a1a}
-.btn-download{background:transparent;color:#c8ff00;border:1px solid #c8ff00;padding:.4rem 1rem;font-size:.75rem}
-.btn-download:hover{background:#c8ff00;color:#0a0a0a}
-.btn-link{background:transparent;color:#c8ff00;padding:0;font-family:'DM Mono',monospace;font-size:.85rem;text-decoration:underline}
-.input{width:100%;padding:.75rem 1rem;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#f5f2eb;font-family:'DM Mono',monospace;font-size:.85rem;outline:none;transition:border .15s}
-.input:focus{border-color:#c8ff00}
-.input::placeholder{color:#555}
-.otp-input{text-align:center;font-size:2rem;letter-spacing:8px;font-family:Syne,sans-serif;font-weight:700;padding:.75rem}
-.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;min-height:200px;border:2px dashed #333;border-radius:12px;padding:2rem;cursor:pointer;transition:all .2s;text-align:center}
-.dropzone.active,.dropzone.dragover{border-color:#c8ff00;background:#1a1a1a}
-.dropzone-icon{font-size:2.5rem;line-height:1;color:#c8ff00;opacity:.6}
-.dropzone-text{color:#888;font-size:.85rem;max-width:260px}
-.dropzone-text strong{color:#c8ff00;font-weight:400}
-.spinner{display:none;flex-direction:column;align-items:center;gap:1rem;padding:2rem}
-.spinner.show{display:flex}
-.spinner-ring{width:36px;height:36px;border:3px solid #1a1a1a;border-top-color:#c8ff00;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner-text{color:#888;font-size:.8rem}
-.table-wrap{overflow-x:auto;margin-top:1rem}
-table{width:100%;border-collapse:collapse;font-size:.75rem}
-th{text-align:left;padding:.6rem .4rem;color:#888;font-family:Syne,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.65rem;border-bottom:1px solid #1a1a1a}
-td{padding:.6rem .4rem;border-bottom:1px solid #1a1a1a;white-space:nowrap}
-td:last-child,th:last-child{text-align:right}
-td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
-.alert{padding:.9rem 1rem;border-radius:8px;font-size:.8rem;display:none;margin-bottom:1rem}
-.alert.show{display:block}
-.alert-success{background:#0f2e00;border:1px solid #c8ff00;color:#c8ff00}
-.alert-error{background:#2e0000;border:1px solid #ff4444;color:#ff6b6b}
-.alert-warning{background:#2e1f00;border:1px solid #ffa500;color:#ffa500}
-.alert-info{background:#0a1a2e;border:1px solid #4488ff;color:#88bbff}
-.section{display:none}
-.section.show{display:block}
-.storico-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.6rem 0;border-bottom:1px solid #141414;font-size:.75rem}
-.storico-item:last-child{border-bottom:none}
-.storico-file{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aaa}
-.storico-date{color:#555;font-size:.65rem;white-space:nowrap}
-.storico-status{font-size:.8rem}
-.status-ok{color:#c8ff00}
-.status-err{color:#ff4444}
-.banner-fixed{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #1a1a1a;padding:.8rem 1rem;z-index:100;display:none}
-.banner-fixed.show{display:block}
-.banner-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
-.banner-text{font-size:.75rem;color:#888}
-.banner-text strong{color:#f5f2eb}
-.result-card{display:none}
-.result-card.show{display:block}
-.result-actions{display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap}
-.mt-1{margin-top:1rem}
-.mt-2{margin-top:2rem}
-.mb-1{margin-bottom:1rem}
-.text-center{text-align:center}
-.text-muted{color:#555;font-size:.7rem}
-.flex{display:flex}
-.gap-1{gap:1rem}
-.hidden{display:none!important}
+/* HEADER */
+.header{width:100%;max-width:440px;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem}
+.header-brand{display:flex;flex-direction:column;gap:2px}
+.header-brand h1{font-size:20px;font-weight:600;color:#1a1a2e;letter-spacing:-0.01em}
+.header-brand span{font-size:12px;color:#5a6578}
+.header-help{font-size:14px;color:#2563eb;font-weight:500;padding-top:4px}
+
+/* CARD */
+.card{background:#fff;max-width:440px;width:100%;border-radius:12px;padding:40px;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.03);border:1px solid #e5e7eb}
+
 /* TABS */
-.auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:1px solid #1a1a1a}
-.auth-tab{padding:.6rem 1.2rem;font-family:Syne,sans-serif;font-weight:600;font-size:.8rem;cursor:pointer;color:#555;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none}
-.auth-tab.active{color:#c8ff00;border-bottom-color:#c8ff00}
-.auth-tab:hover{color:#f5f2eb}
-@media(max-width:480px){
-.container{padding:1rem .75rem}
-.header-brand h1{font-size:1.2rem}
-.card{padding:1rem}
-.dropzone{min-height:160px;padding:1.5rem}
-.btn{font-size:.8rem;padding:.6rem 1.2rem}
-table{font-size:.7rem}
+.tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid #e5e7eb}
+.tab{flex:1;padding:0 0 12px;font-size:14px;font-weight:500;color:#9ca3af;cursor:pointer;border:none;background:none;font-family:Inter;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.tab.active{color:#1a1a2e;border-bottom-color:#2563eb}
+.tab:hover:not(.active){color:#5a6578}
+.tab-form{display:none}
+.tab-form.active{display:block}
+
+/* TYPOGRAPHY */
+.form-title{font-size:24px;font-weight:600;color:#1a1a2e;margin-bottom:6px}
+.form-subtitle{font-size:14px;color:#5a6578;margin-bottom:28px;line-height:1.4}
+
+/* FORM */
+.field{margin-bottom:18px}
+.field-label{display:block;font-size:13px;font-weight:500;color:#1a1a2e;margin-bottom:6px}
+.input-wrap{position:relative;display:flex;align-items:center}
+.input-icon{position:absolute;left:12px;pointer-events:none;display:flex;align-items:center}
+.input-icon svg{width:18px;height:18px;stroke:#9ca3af;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.input-field{width:100%;padding:10px 12px 10px 40px;font-size:14px;font-family:Inter;color:#1a1a2e;background:#fff;border:1px solid #d1d5db;border-radius:8px;outline:none;transition:border-color .15s,box-shadow .15s}
+.input-field::placeholder{color:#9ca3af}
+.input-field:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.input-field.error{border-color:#dc2626}
+.input-field.error:focus{box-shadow:0 0 0 3px rgba(220,38,38,0.1)}
+
+/* Password eye toggle */
+.input-toggle{position:absolute;right:10px;background:none;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;border-radius:4px}
+.input-toggle:hover{background:#f3f4f6}
+.input-toggle svg{width:18px;height:18px;stroke:#9ca3af;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* Error */
+.error-text{font-size:12px;color:#dc2626;margin-top:6px;display:none;line-height:1.3}
+.error-text.show{display:block}
+
+/* Checkbox */
+.checkbox-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:18px}
+.checkbox-row input[type=checkbox]{margin-top:2px;accent-color:#2563eb;width:16px;height:16px;cursor:pointer;flex-shrink:0}
+.checkbox-row label{font-size:13px;color:#5a6578;line-height:1.4;cursor:pointer}
+.checkbox-row label a{font-weight:500}
+
+/* BUTTON */
+.btn{width:100%;padding:12px 20px;font-size:14px;font-weight:500;font-family:Inter;letter-spacing:0.01em;border:none;border-radius:8px;cursor:pointer;transition:background .15s,opacity .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-primary:hover{background:#1d4ed8}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary:disabled:hover{background:#2563eb}
+.btn-spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.btn.loading .btn-text{display:none}
+.btn.loading .btn-spinner{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Toggle auth mode link */
+.auth-switch{text-align:center;margin-top:18px;font-size:14px;color:#5a6578}
+.auth-switch a{font-weight:500;cursor:pointer}
+.auth-switch a:hover{text-decoration:underline}
+
+/* SECURITY FOOTER */
+.security-box{max-width:440px;width:100%;margin-top:24px;background:#f3f4f6;border-radius:8px;padding:16px}
+.security-box h3{font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:6px}
+.security-box p{font-size:13px;color:#5a6578;line-height:1.5;margin-bottom:6px}
+.security-box a{font-size:13px;font-weight:500}
+
+/* Helpers */
+.hint-text{font-size:12px;color:#9ca3af;margin-top:4px;line-height:1.3}
+
+/* RESPONSIVE */
+@media(max-width:520px){
+  body{padding:1rem .5rem}
+  .card{padding:24px 20px;border-radius:10px}
+  .header{margin-bottom:1.5rem;flex-direction:column;gap:4px}
+  .form-title{font-size:20px}
 }
 </style>
 </head>
 <body>
 
-<div class="container" id="app">
+<header class="header">
+  <div class="header-brand">
+    <h1>FatturaLens</h1>
+    <span>Estrazione dati da fatture PDF</span>
+  </div>
+  <a class="header-help" href="#contatto">Hai bisogno di aiuto?</a>
+</header>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="header-brand">
-      <h1>FatturaLens</h1>
+<div class="card">
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" id="tabLogin" onclick="switchTab('login')">Accedi</button>
+    <button class="tab" id="tabRegister" onclick="switchTab('register')">Registrati</button>
+  </div>
+
+  <!-- ===== LOGIN FORM ===== -->
+  <div class="tab-form active" id="formLogin">
+    <h2 class="form-title">Accedi al tuo studio</h2>
+    <p class="form-subtitle">Inserisci le credenziali per accedere alla tua area riservata.</p>
+
+    <div class="field">
+      <label class="field-label" for="loginEmail">Email professionale</label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><polyline points="2,7 12,13 22,7"/></svg>
+        </span>
+        <input class="input-field" id="loginEmail" type="email" placeholder="nome@studio.it" autocomplete="email" oninput="validateLogin()">
+      </div>
+      <div class="error-text" id="loginEmailError">Inserisci un'email valida</div>
     </div>
-    <div id="headerInfo" style="display:none;align-items:center;gap:.5rem;flex-wrap:wrap">
-      <span id="userEmail" style="font-size:.7rem;color:#666"></span>
-      <span id="userBadge" class="badge"></span>
-      <span id="userCounter" class="counter"></span>
+
+    <div class="field">
+      <label class="field-label" for="loginPassword">Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        <input class="input-field" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" oninput="validateLogin()">
+        <button class="input-toggle" type="button" onclick="togglePassword('loginPassword',this)" aria-label="Mostra o nascondi password">
+          <svg viewBox="0 0 24 24" id="loginEye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
     </div>
-  </header>
 
-  <!-- SECTION: AUTH -->
-  <div id="sectionAuth" class="section show">
-    <div class="card" style="border-color:#1a1a1a">
-      <!-- Tabs -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Accedi</button>
-        <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Registrati</button>
-      </div>
+    <button class="btn btn-primary" id="loginBtn" disabled onclick="submitLogin()">
+      <span class="btn-text">Accedi</span>
+      <span class="btn-spinner"></span>
+    </button>
 
-      <!-- Login form -->
-      <div id="loginForm">
-        <div id="authAlert" class="alert"></div>
-        <div style="display:flex;flex-direction:column;gap:.75rem">
-          <input id="loginEmail" class="input" type="email" placeholder="Email" autocomplete="email">
-          <div>
-            <input id="loginPassword" class="input" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-          </div>
-          <button id="loginBtn" class="btn btn-primary" onclick="doLogin()">Accedi</button>
-        </div>
-      </div>
-
-      <!-- Register form -->
-      <div id="registerForm" style="display:none">
-        <div id="regAlert" class="alert"></div>
-        <div style="display:flex;flex-direction:column;gap:.75rem">
-          <input id="regName" class="input" type="text" placeholder="Nome e cognome" autocomplete="name">
-          <input id="regEmail" class="input" type="email" placeholder="Email" autocomplete="email">
-          <input id="regPassword" class="input" type="password" placeholder="Password (min. 6 caratteri)" autocomplete="new-password">
-          <input id="regPasswordConfirm" class="input" type="password" placeholder="Conferma password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
-          <button id="regBtn" class="btn btn-primary" onclick="doRegister()">Registrati</button>
-        </div>
-      </div>
+    <div class="auth-switch">
+      Non hai un account? <a onclick="switchTab('register')">Registrati</a>
     </div>
   </div>
 
-  <!-- SECTION: DASHBOARD -->
-  <div id="sectionDashboard" class="section">
-    <div class="card">
-      <div class="card-label">Carica fattura</div>
-      <div id="dropzone" class="dropzone" onclick="document.getElementById('fileInput').click()">
-        <div class="dropzone-icon">&#x2191;</div>
-        <div class="dropzone-text">Trascina qui il PDF <strong>o clicca per selezionare</strong></div>
-      </div>
-      <input id="fileInput" type="file" accept=".pdf" style="display:none" onchange="handleFileSelect(event)">
-      <div id="spinner" class="spinner">
-        <div class="spinner-ring"></div>
-        <div class="spinner-text">Estrazione dati in corso...</div>
-      </div>
-      <div id="uploadAlert" class="alert"></div>
-      <div id="resultCard" class="card result-card mt-1" style="margin-bottom:0">
-        <div class="card-label">Anteprima fattura</div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr>
-              <th>Data</th><th>Numero</th><th>Fornitore</th><th>P.IVA</th><th>Imponibile</th><th>IVA</th><th>Totale</th>
-            </tr></thead>
-            <tbody id="resultBody"></tbody>
-          </table>
-        </div>
-        <div class="result-actions">
-          <a id="downloadBtn" class="btn btn-download" href="#" download>Scarica Excel</a>
-        </div>
+  <!-- ===== REGISTER FORM ===== -->
+  <div class="tab-form" id="formRegister">
+    <h2 class="form-title">Crea il tuo account</h2>
+    <p class="form-subtitle">5 fatture gratuite. Nessuna carta di credito richiesta.</p>
+
+    <div class="field">
+      <label class="field-label" for="regName">Nome dello studio o ragione sociale</label>
+      <div class="input-wrap">
+        <input class="input-field" id="regName" type="text" placeholder="Studio Commercialista Rossi" style="padding-left:12px" oninput="validateRegister()">
       </div>
     </div>
-    <div class="card">
-      <div class="card-label">Storico ultimi upload</div>
-      <div id="storicoList">
-        <p class="text-muted" style="font-size:.75rem">Carica la prima fattura per vedere lo storico.</p>
+
+    <div class="field">
+      <label class="field-label" for="regEmail">Email professionale</label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><polyline points="2,7 12,13 22,7"/></svg>
+        </span>
+        <input class="input-field" id="regEmail" type="email" placeholder="nome@studio.it" autocomplete="email" oninput="validateRegister()">
       </div>
+      <div class="error-text" id="regEmailError">Inserisci un'email valida</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="regPassword">Password</label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        <input class="input-field" id="regPassword" type="password" placeholder="Crea una password sicura" autocomplete="new-password" oninput="validateRegister()">
+        <button class="input-toggle" type="button" onclick="togglePassword('regPassword',this)" aria-label="Mostra o nascondi password">
+          <svg viewBox="0 0 24 24" id="regEye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      <div class="hint-text">Minimo 8 caratteri, una maiuscola e un numero</div>
+      <div class="error-text" id="regPasswordError">La password deve contenere almeno 8 caratteri, una maiuscola e un numero</div>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="regPasswordConfirm">Conferma password</label>
+      <div class="input-wrap">
+        <span class="input-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        <input class="input-field" id="regPasswordConfirm" type="password" placeholder="Ripeti la password" autocomplete="new-password" oninput="validateRegister()">
+      </div>
+      <div class="error-text" id="regPasswordMatchError">Le password non corrispondono</div>
+    </div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="regTerms" onchange="validateRegister()">
+      <label for="regTerms">Accetto i <a href="#">Termini di servizio</a> e la <a href="#">Privacy Policy</a></label>
+    </div>
+
+    <button class="btn btn-primary" id="regBtn" disabled onclick="submitRegister()">
+      <span class="btn-text">Crea account gratis</span>
+      <span class="btn-spinner"></span>
+    </button>
+
+    <div class="auth-switch">
+      Hai già un account? <a onclick="switchTab('login')">Accedi</a>
     </div>
   </div>
-
 </div>
 
-<!-- BANNER FISSO PAGAMENTO -->
-<div id="paymentBanner" class="banner-fixed">
-  <div class="banner-inner">
-    <span class="banner-text">Hai usato <strong id="bannerCount">0/5</strong> fatture gratuite. <strong>Passa a Base o Pro</strong></span>
-    <a id="stripeLink" class="btn btn-primary" href="#" target="_blank" style="font-size:.75rem;padding:.5rem 1.2rem">Scegli piano</a>
-  </div>
+<div class="security-box">
+  <h3>I tuoi dati sono al sicuro</h3>
+  <p>FatturaLens è conforme al GDPR. I dati delle fatture vengono processati automaticamente e non vengono mai archiviati oltre il tempo necessario. Tutte le comunicazioni sono crittografate.</p>
+  <a href="#">Leggi la Privacy Policy</a>
 </div>
 
 <script>
-const API_URL = window.location.origin;
-let TOKEN = '';
-let USER = null;
-
-// ============ INIT ============
-document.addEventListener('DOMContentLoaded', () => {
-  TOKEN = localStorage.getItem('fatturalens_token') || '';
-  if (TOKEN) loadDashboard();
-});
-
-// ============ AUTH TABS ============
-function switchAuthTab(mode) {
-  document.getElementById('loginForm').style.display = mode === 'login' ? 'block' : 'none';
-  document.getElementById('registerForm').style.display = mode === 'register' ? 'block' : 'none';
-  document.getElementById('tabLogin').className = 'auth-tab' + (mode==='login' ? ' active' : '');
-  document.getElementById('tabRegister').className = 'auth-tab' + (mode==='register' ? ' active' : '');
-  document.getElementById('authAlert').className = 'alert';
-  document.getElementById('authAlert').classList.remove('show');
-  document.getElementById('regAlert').className = 'alert';
-  document.getElementById('regAlert').classList.remove('show');
+// ============ TAB SWITCH ============
+function switchTab(mode) {
+  document.getElementById('tabLogin').className = 'tab' + (mode==='login'?' active':'');
+  document.getElementById('tabRegister').className = 'tab' + (mode==='register'?' active':'');
+  document.getElementById('formLogin').className = 'tab-form' + (mode==='login'?' active':'');
+  document.getElementById('formRegister').className = 'tab-form' + (mode==='register'?' active':'');
 }
 
-// ============ LOGIN ============
-async function doLogin() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const password = document.getElementById('loginPassword').value;
-
-  const alert = document.getElementById('authAlert');
-  alert.className = 'alert';
-  alert.textContent = '';
-  alert.classList.remove('show');
-
-  if (!email || !password) {
-    alert.className = 'alert alert-error show';
-    alert.textContent = 'Inserisci email e password.';
-    return;
+// ============ PASSWORD TOGGLE ============
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isPassword = input.type === 'password';
+  input.type = isPassword ? 'text' : 'password';
+  const svg = btn.querySelector('svg');
+  if (isPassword) {
+    // Eye with line (hidden state)
+    svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    // Eye open
+    svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
   }
+}
+
+// ============ VALIDATION HELPERS ============
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+function isStrongPassword(v) {
+  return v.length >= 8 && /[A-Z]/.test(v) && /[0-9]/.test(v);
+}
+
+function showError(id, show) {
+  const el = document.getElementById(id);
+  el.className = 'error-text' + (show ? ' show' : '');
+}
+
+// ============ LOGIN VALIDATION ============
+function validateLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPassword').value;
+  const emailOk = isValidEmail(email);
+  const passOk = pass.length > 0;
+
+  document.getElementById('loginEmail').classList.toggle('error', email.length > 0 && !emailOk);
+  showError('loginEmailError', email.length > 0 && !emailOk);
 
   const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.textContent = 'Accesso...';
+  btn.disabled = !(emailOk && passOk);
+}
+
+// ============ REGISTER VALIDATION ============
+function validateRegister() {
+  const email = document.getElementById('regEmail').value;
+  const pass = document.getElementById('regPassword').value;
+  const passConfirm = document.getElementById('regPasswordConfirm').value;
+  const terms = document.getElementById('regTerms').checked;
+  const nameLen = document.getElementById('regName').value.trim().length > 0;
+
+  const emailOk = isValidEmail(email);
+  const passOk = isStrongPassword(pass);
+  const matchOk = pass === passConfirm && pass.length > 0;
+
+  document.getElementById('regEmail').classList.toggle('error', email.length > 0 && !emailOk);
+  showError('regEmailError', email.length > 0 && !emailOk);
+
+  document.getElementById('regPassword').classList.toggle('error', pass.length > 0 && !passOk);
+  showError('regPasswordError', pass.length > 0 && !passOk);
+
+  document.getElementById('regPasswordConfirm').classList.toggle('error', passConfirm.length > 0 && !matchOk);
+  showError('regPasswordMatchError', passConfirm.length > 0 && !matchOk);
+
+  const btn = document.getElementById('regBtn');
+  btn.disabled = !(nameLen && emailOk && passOk && matchOk && terms);
+}
+
+// ============ SUBMIT LOGIN ============
+async function submitLogin() {
+  const btn = document.getElementById('loginBtn');
+  if (btn.disabled) return;
+  btn.classList.add('loading');
+
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
 
   try {
-    const res = await fetch(`${API_URL}/login`, {
+    const res = await fetch('/login', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({email, password})
     });
     const data = await res.json();
-
     if (data.success) {
-      TOKEN = data.token;
-      USER = data.user;
-      localStorage.setItem('fatturalens_token', TOKEN);
-      enterDashboard(data.user);
+      localStorage.setItem('fatturalens_token', data.token);
+      window.location.href = '/app';
     } else {
-      alert.className = 'alert alert-error show';
-      alert.textContent = data.error || 'Email o password errate.';
+      alert(data.error || 'Email o password errate.');
     }
   } catch(e) {
-    alert.className = 'alert alert-error show';
-    alert.textContent = 'Errore di connessione.';
+    alert('Errore di connessione al server.');
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Accedi';
+    btn.classList.remove('loading');
   }
 }
 
-// ============ REGISTER ============
-async function doRegister() {
+// ============ SUBMIT REGISTER ============
+async function submitRegister() {
+  const btn = document.getElementById('regBtn');
+  if (btn.disabled) return;
+  btn.classList.add('loading');
+
   const nome = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
+  const email = document.getElementById('regEmail').value;
   const password = document.getElementById('regPassword').value;
   const password_confirm = document.getElementById('regPasswordConfirm').value;
 
-  const alert = document.getElementById('regAlert');
-  alert.className = 'alert';
-  alert.textContent = '';
-  alert.classList.remove('show');
-
-  if (!nome) {
-    alert.className = 'alert alert-error show'; alert.textContent = 'Inserisci il nome.'; return;
-  }
-  if (!email) {
-    alert.className = 'alert alert-error show'; alert.textContent = 'Inserisci l\'email.'; return;
-  }
-  if (password.length < 6) {
-    alert.className = 'alert alert-error show'; alert.textContent = 'Password: minimo 6 caratteri.'; return;
-  }
-  if (password !== password_confirm) {
-    alert.className = 'alert alert-error show'; alert.textContent = 'Le password non coincidono.'; return;
-  }
-
-  const btn = document.getElementById('regBtn');
-  btn.disabled = true;
-  btn.textContent = 'Registrazione...';
-
   try {
-    const res = await fetch(`${API_URL}/register`, {
+    const res = await fetch('/register', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({nome, email, password, password_confirm})
     });
     const data = await res.json();
-
     if (data.success) {
-      TOKEN = data.token;
-      localStorage.setItem('fatturalens_token', TOKEN);
-      // Build user object from register response + defaults
-      USER = { email, nome: data.nome, piano: 'free', fatture_processate_mese: 0, limite_mensile: 5 };
-      enterDashboard(USER);
+      localStorage.setItem('fatturalens_token', data.token);
+      window.location.href = '/app';
     } else {
-      alert.className = 'alert alert-error show';
-      alert.textContent = data.error || 'Errore durante la registrazione.';
+      alert(data.error || 'Errore durante la registrazione.');
     }
   } catch(e) {
-    alert.className = 'alert alert-error show';
-    alert.textContent = 'Errore di connessione.';
+    alert('Errore di connessione al server.');
   } finally {
-    btn.disabled = false;
-    btn.textContent = 'Registrati';
+    btn.classList.remove('loading');
   }
-}
-
-// ============ DASHBOARD ============
-function enterDashboard(user, storico) {
-  USER = user;
-  document.getElementById('sectionAuth').classList.remove('show');
-  document.getElementById('sectionDashboard').classList.add('show');
-  document.getElementById('headerInfo').style.display = 'flex';
-  document.getElementById('userEmail').textContent = user.email;
-  const badge = document.getElementById('userBadge');
-  badge.textContent = user.piano.toUpperCase();
-  badge.className = 'badge badge-' + user.piano;
-  document.getElementById('userCounter').textContent =
-    `${user.fatture_processate_mese}/${user.limite_mensile} fatture questo mese`;
-  if (user.piano === 'free') {
-    document.getElementById('bannerCount').textContent =
-      `${user.fatture_processate_mese}/${user.limite_mensile}`;
-    document.getElementById('paymentBanner').classList.add('show');
-  }
-  if (storico) renderStorico(storico);
-}
-
-async function loadDashboard() {
-  try {
-    const res = await fetch(`${API_URL}/dashboard?token=${TOKEN}`);
-    const data = await res.json();
-    if (!data.success) {
-      localStorage.removeItem('fatturalens_token');
-      showAuth();
-      return;
-    }
-    enterDashboard(data.user, data.storico || []);
-  } catch(e) {
-    localStorage.removeItem('fatturalens_token');
-    showAuth();
-  }
-}
-
-function showAuth() {
-  document.getElementById('sectionDashboard').classList.remove('show');
-  document.getElementById('headerInfo').style.display = 'none';
-  document.getElementById('paymentBanner').classList.remove('show');
-  document.getElementById('sectionAuth').classList.add('show');
-}
-
-// ============ UPLOAD ============
-function handleFileSelect(e) {
-  const file = e.target.files[0];
-  if (file) uploadFile(file);
-}
-
-const dropzone = document.getElementById('dropzone');
-dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
-dropzone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropzone.classList.remove('dragover');
-  const file = e.dataTransfer.files[0];
-  if (file && file.type === 'application/pdf') uploadFile(file);
-});
-
-async function uploadFile(file) {
-  const alert = document.getElementById('uploadAlert');
-  alert.className = 'alert';
-  alert.textContent = '';
-  alert.classList.remove('show');
-  document.getElementById('resultCard').classList.remove('show');
-  document.getElementById('spinner').classList.add('show');
-  dropzone.style.display = 'none';
-  document.getElementById('fileInput').value = '';
-
-  try {
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('email', USER.email);
-
-    const res = await fetch(`${API_URL}/upload`, { method: 'POST', body: fd });
-    const data = await res.json();
-
-    if (res.status === 403) {
-      alert.className = 'alert alert-error show';
-      alert.innerHTML = 'Hai esaurito le fatture del piano Free. Passa a Base (29€) o Pro (49€).';
-      return;
-    }
-    if (res.status === 422 || !data.success) {
-      alert.className = 'alert alert-error show';
-      alert.innerHTML = 'Impossibile leggere questa fattura. Riprova o contatta supporto.';
-      return;
-    }
-    if (!data.success) {
-      alert.className = 'alert alert-error show';
-      alert.textContent = data.error || 'Errore durante l\'elaborazione.';
-      return;
-    }
-
-    document.getElementById('resultCard').classList.add('show');
-    const tbody = document.getElementById('resultBody');
-    const r = data.data;
-    tbody.innerHTML = `<tr>
-      <td>${r.Data || ''}</td>
-      <td>${r.Numero || ''}</td>
-      <td>${r.Fornitore || ''}</td>
-      <td>${r['P.IVA'] || ''}</td>
-      <td><span class="amount">${fmtEuro(r.Imponibile)}</span></td>
-      <td><span class="amount">${fmtEuro(r.IVA)}</span></td>
-      <td><span class="amount">${fmtEuro(r.Totale)}</span></td>
-    </tr>`;
-    document.getElementById('downloadBtn').href = `${API_URL}${data.excel_url}`;
-    await loadDashboard();
-
-  } catch(e) {
-    alert.className = 'alert alert-error show';
-    alert.textContent = 'Errore di connessione.';
-  } finally {
-    document.getElementById('spinner').classList.remove('show');
-    dropzone.style.display = 'flex';
-  }
-}
-
-// ============ STORICO ============
-function renderStorico(list) {
-  const el = document.getElementById('storicoList');
-  if (!list.length) {
-    el.innerHTML = '<p class="text-muted" style="font-size:.75rem">Carica la prima fattura per vedere lo storico.</p>';
-    return;
-  }
-  let html = '';
-  list.slice(0,10).forEach(item => {
-    const ok = item.status === 'done';
-    let data = '';
-    try { const j = JSON.parse(item.data); data = j.data_emissione || ''; } catch(e) {}
-    const file = item.file || 'fattura.pdf';
-    const date = item.created_at ? item.created_at.slice(0,10) : '';
-    html += `<div class="storico-item">
-      <span class="storico-file" title="${file}">${file}</span>
-      <span class="storico-date">${data || date}</span>
-      <span class="storico-status ${ok ? 'status-ok' : 'status-err'}">${ok ? '&#10003;' : '&#10007;'}</span>
-      ${ok ? `<a href="${API_URL}/download/${item.id}" class="btn btn-download" style="padding:.3rem .6rem;font-size:.65rem" download>Scarica</a>` : ''}
-    </div>`;
-  });
-  el.innerHTML = html;
-}
-
-// ============ UTILS ============
-function fmtEuro(n) {
-  if (n === null || n === undefined || n === '') return '&mdash;';
-  const num = parseFloat(n);
-  if (isNaN(num)) return '&mdash;';
-  return '€ ' + num.toFixed(2).replace('.', ',');
 }
 </script>
-
 </body>
 </html>
