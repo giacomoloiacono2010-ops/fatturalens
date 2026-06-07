@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FatturaLens — Da PDF a Excel in 10 secondi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800;900&family=DM+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:#0a0a0a;color:#f5f2eb;font-family:'DM Mono',monospace;overflow-x:hidden}
+h1,h2,h3,h4{font-family:Syne,sans-serif;font-weight:700;color:#f5f2eb}
+a{color:#c8ff00;text-decoration:none}
+img{max-width:100%;height:auto}
+.container{width:100%;max-width:720px;margin:0 auto;padding:0 1.5rem}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,10,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #141414;padding:.65rem 0}
+.nav .container{display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-family:Syne,sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-.03em;background:linear-gradient(135deg,#f5f2eb,#c8ff00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nav-cta{background:#c8ff00;color:#0a0a0a;padding:.4rem 1rem;border-radius:6px;font-family:Syne,sans-serif;font-weight:600;font-size:.75rem;transition:transform .15s}
+.nav-cta:hover{transform:translateY(-1px);text-decoration:none}
+/* HERO */
+.hero{padding:7rem 0 4rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40%;left:50%;width:600px;height:600px;background:radial-gradient(circle,rgba(200,255,0,.04) 0%,transparent 70%);transform:translateX(-50%);pointer-events:none}
+.hero-badge{display:inline-block;background:#141414;border:1px solid #1a1a1a;padding:.3rem .8rem;border-radius:999px;font-size:.65rem;color:#888;margin-bottom:1.5rem;font-family:Syne,sans-serif;font-weight:500;text-transform:uppercase;letter-spacing:.08em}
+.hero h1{font-size:3.2rem;font-weight:900;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem;background:linear-gradient(180deg,#f5f2eb 40%,#a8cc00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:.95rem;color:#888;max-width:480px;margin:0 auto 2rem;line-height:1.6}
+.hero-cta{display:inline-flex;align-items:center;gap:.5rem;background:#c8ff00;color:#0a0a0a;padding:.85rem 2rem;border-radius:8px;font-family:Syne,sans-serif;font-weight:700;font-size:.9rem;transition:all .15s}
+.hero-cta:hover{background:#b8ee00;transform:translateY(-2px);text-decoration:none}
+.hero-meta{margin-top:1.5rem;font-size:.7rem;color:#555}
+/* SECTIONS */
+.section{padding:4rem 0}
+.section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.12em;color:#666;margin-bottom:.5rem;font-family:Syne,sans-serif;font-weight:600}
+.section h2{font-size:2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.75rem}
+.section h2 span{color:#c8ff00}
+.section-sub{color:#888;font-size:.85rem;max-width:450px;line-height:1.6;margin-bottom:2.5rem}
+/* ANIMATION */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.fade-in.show{opacity:1;transform:translateY(0)}
+/* CARDS GRID */
+.grid{display:grid;grid-template-columns:1fr;gap:1rem}
+@media(min-width:600px){.grid-3{grid-template-columns:1fr 1fr 1fr}}
+@media(min-width:600px){.grid-2{grid-template-columns:1fr 1fr}}
+.card{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:1.5rem;transition:border .2s,transform .2s}
+.card:hover{border-color:#2a2a2a;transform:translateY(-2px)}
+.card-icon{font-size:1.6rem;margin-bottom:.75rem;display:block;line-height:1}
+.card h3{font-size:.95rem;margin-bottom:.4rem;letter-spacing:-.01em}
+.card p{color:#888;font-size:.78rem;line-height:1.5}
+/* PROBLEM */
+.problem-card{border-left:2px solid #ff4444}
+.problem-card .card-icon{color:#ff6b6b}
+/* SOLUTION */
+.solution-steps{margin-top:2rem}
+.step{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid #141414}
+.step:last-child{border-bottom:none}
+.step-num{background:#c8ff00;color:#0a0a0a;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:700;font-size:.75rem;flex-shrink:0;margin-top:2px}
+.step-text h4{font-size:.85rem;margin-bottom:.15rem}
+.step-text p{color:#888;font-size:.75rem;line-height:1.4}
+/* VIDEO PLACEHOLDER */
+.video-placeholder{width:100%;aspect-ratio:16/9;background:#111;border:1px solid #1a1a1a;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;color:#444;font-size:.8rem;font-family:Syne,sans-serif}
+.video-placeholder .play-icon{font-size:2rem;color:#333;line-height:1}
+/* PRICING */
+.pricing-grid{grid-template-columns:1fr;gap:1rem}
+@media(min-width:600px){.pricing-grid{grid-template-columns:1fr 1fr 1fr}}
+.pricing-card{text-align:center;padding:2rem 1rem;position:relative}
+.pricing-card.featured{border-color:#c8ff00;background:#141400}
+.pricing-card.featured .pricing-popular{position:absolute;top:-.6rem;left:50%;transform:translateX(-50%);background:#c8ff00;color:#0a0a0a;padding:.2rem .8rem;border-radius:999px;font-size:.6rem;font-family:Syne,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.pricing-name{font-family:Syne,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;margin-bottom:.3rem}
+.pricing-price{font-size:2.2rem;font-weight:800;font-family:Syne,sans-serif;letter-spacing:-.03em;margin-bottom:.2rem}
+.pricing-price span{font-size:.9rem;font-weight:400;color:#888}
+.pricing-desc{color:#888;font-size:.75rem;margin-bottom:1.2rem}
+.pricing-amount{color:#555;font-size:.7rem;margin-bottom:1rem}
+.pricing-btn{display:inline-block;background:#1a1a1a;color:#f5f2eb;padding:.6rem 1.5rem;border-radius:6px;font-family:Syne,sans-serif;font-weight:600;font-size:.8rem;transition:all .15s;width:100%}
+.pricing-btn:hover{background:#2a2a2a;text-decoration:none}
+.pricing-btn.primary{background:#c8ff00;color:#0a0a0a}
+.pricing-btn.primary:hover{background:#b8ee00}
+.pricing-features{list-style:none;margin-top:1rem;padding:0;text-align:left}
+.pricing-features li{color:#888;font-size:.72rem;padding:.3rem 0;display:flex;align-items:center;gap:.4rem}
+.pricing-features li::before{content:'\2713';color:#c8ff00;font-weight:700}
+/* FAQ */
+.faq-item{border-bottom:1px solid #141414;padding:1rem 0}
+.faq-item:first-child{border-top:1px solid #141414}
+.faq-q{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:Syne,sans-serif;font-weight:600;font-size:.85rem;gap:.5rem;user-select:none}
+.faq-q .arrow{color:#555;font-size:.7rem;transition:transform .2s;flex-shrink:0}
+.faq-item.open .faq-q .arrow{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease,padding .25s ease;color:#888;font-size:.78rem;line-height:1.5}
+.faq-item.open .faq-a{max-height:300px;padding-top:.75rem}
+/* FOOTER */
+footer{padding:2.5rem 0;text-align:center;border-top:1px solid #141414}
+footer p{color:#555;font-size:.75rem}
+footer a{color:#888}
+footer a:hover{color:#c8ff00}
+/* RESPONSIVE */
+@media(max-width:480px){
+.hero h1{font-size:2.2rem}
+.hero{padding:5rem 0 3rem}
+.section{padding:2.5rem 0}
+.section h2{font-size:1.5rem}
+.card{padding:1.25rem}
+.pricing-card{padding:1.5rem 1rem}
+.container{padding:0 1rem}
+}
+/* INTERSECTION OBSERVER FALLBACK */
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <span class="nav-brand">FatturaLens</span>
+    <a href="/app" class="nav-cta">Accedi</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">Per commercialisti e studi professionali</div>
+    <h1>FatturaLens</h1>
+    <p>Trasforma fatture PDF in Excel in 10 secondi. Zero errori manuali.</p>
+    <a href="/app" class="hero-cta">Prova 5 fatture gratis &rarr;</a>
+    <p class="hero-meta">Niente carta di credito &middot; 5 fatture gratuite &middot; Attivo in 10 secondi</p>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="section" id="problema">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-label">Il problema</div>
+      <h2>Inserire fatture a mano è <span>una perdita di tempo</span></h2>
+      <p class="section-sub">Ogni giorno commercialisti e impiegati perdono ore a ricopiare dati. Con i rischi che conosci.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card problem-card fade-in">
+        <span class="card-icon">&#x23F0;</span>
+        <h3>2 ore a settimana sprecate</h3>
+        <p>Digitare fatture a mano costa 2 ore a settimana per studio. Moltiplicate per 12 mesi sono giorni di lavoro buttati.</p>
+      </div>
+      <div class="card problem-card fade-in">
+        <span class="card-icon">&#x26A0;&#xFE0F;</span>
+        <h3>Errori di trascrizione = sanzioni</h3>
+        <p>Un numero sbagliato, una P.IVA diversa, un importo fuori posto. Ogni errore è rischio sanzione o cliente perso.</p>
+      </div>
+      <div class="card problem-card fade-in">
+        <span class="card-icon">&#x1F614;</span>
+        <h3>I tuoi impiegati odiano questo lavoro</h3>
+        <p>Inserire fatture è noioso, ripetitivo, demotivante. Il turnover tra chi lo fa è alto e costa caro allo studio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUZIONE -->
+<section class="section" id="soluzione" style="background:#0e0e0e">
+  <div class="container">
+    <div class="fade-in">
+      <div class="section-label">La soluzione</div>
+      <h2>Fai in 10 secondi ciò che <span>prima prendeva 10 minuti</span></h2>
+      <p class="section-sub">Carichi il PDF, l'AI estrae i dati in automatico, scarichi l'Excel. Niente digitazione, niente errori.</p>
+    </div>
+    <div class="video-placeholder fade-in">
+      <span class="play-icon">&#x25B6;</span>
+      [INSERISCI SCREEN RECORDING 60s]
+    </div>
+    <div class="solution-steps">
+      <div class="step fade-in">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <h4>Carica il PDF</h4>
+          <p>Trascina la fattura nell'app o caricala con un click. Accettiamo qualsiasi formato PDF di fattura italiana.</p>
+        </div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <h4>L'AI estrae i dati</h4>
+          <p>FatturaLens legge la fattura con AI e riconosce: data, numero, fornitore, P.IVA, imponibile, IVA, totale.</p>
+        </div>
+      </div>
+      <div class="step fade-in">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <h4>Scarica l'Excel</h4>
+          <p>In 10 secondi hai il file Excel pronto da archiviare, mandare al cliente o importare nel tuo gestionale.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREZZI -->
+<section class="section" id="prezzi">
+  <div class="container">
+    <div class="fade-in" style="text-align:center">
+      <div class="section-label">Piani</div>
+      <h2>Scegli il piano che <span>fa per te</span></h2>
+      <p class="section-sub" style="max-width:100%">Inizia gratis, passa a un piano più ricco quando ti servono più fatture.</p>
+    </div>
+    <div class="grid pricing-grid">
+      <div class="card pricing-card fade-in">
+        <div class="pricing-name" style="color:#888">Free</div>
+        <div class="pricing-price">0<span>€</span></div>
+        <div class="pricing-desc">Per provare senza impegno</div>
+        <div class="pricing-amount">5 fatture / mese</div>
+        <a href="/app" class="pricing-btn primary">Inizia gratis</a>
+        <ul class="pricing-features">
+          <li>5 fatture al mese</li>
+          <li>Estrazione AI</li>
+          <li>Download Excel</li>
+          <li>Supporto email</li>
+        </ul>
+      </div>
+      <div class="card pricing-card featured fade-in">
+        <span class="pricing-popular">Consigliato</span>
+        <div class="pricing-name">Base</div>
+        <div class="pricing-price">29<span>€</span></div>
+        <div class="pricing-desc">Per studi con volume medio</div>
+        <div class="pricing-amount">100 fatture / mese</div>
+        <a href="/app" class="pricing-btn primary">Scegli Base</a>
+        <ul class="pricing-features">
+          <li>100 fatture al mese</li>
+          <li>Estrazione AI</li>
+          <li>Download Excel</li>
+          <li>Supporto prioritario</li>
+        </ul>
+      </div>
+      <div class="card pricing-card fade-in">
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price">49<span>€</span></div>
+        <div class="pricing-desc">Per studi con alto volume</div>
+        <div class="pricing-amount">Fatture illimitate</div>
+        <a href="/app" class="pricing-btn primary">Scegli Pro</a>
+        <ul class="pricing-features">
+          <li>Fatture illimitate</li>
+          <li>Estrazione AI</li>
+          <li>Download Excel</li>
+          <li>Supporto premium</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="fade-in" style="text-align:center">
+      <div class="section-label">FAQ</div>
+      <h2>Domande <span>frequenti</span></h2>
+    </div>
+    <div class="faq-list fade-in" style="margin-top:2rem">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Quanto costa FatturaLens?
+          <span class="arrow">&#x25BC;</span>
+        </div>
+        <div class="faq-a">Puoi iniziare gratis con 5 fatture al mese, nessuna carta di credito richiesta. Quando ti servono più fatture, scegli Base a 29€/mese (100 fatture) o Pro a 49€/mese (illimitate). Puoi passare da un piano all'altro quando vuoi.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          I miei dati sono sicuri?
+          <span class="arrow">&#x25BC;</span>
+        </div>
+        <div class="faq-a">Assolutamente sì. Le fatture vengono elaborate in modo sicuro e i dati non vengono condivisi con terze parti. Non conserviamo i PDF originali dopo l'elaborazione. Usiamo crittografia standard di settore per tutte le comunicazioni.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Funziona con qualsiasi fattura?
+          <span class="arrow">&#x25BC;</span>
+        </div>
+        <div class="faq-a">FatturaLens funziona con la maggior parte delle fatture PDF italiane: fatture elettroniche, fatture da commercialisti, fatture da forfettari, fatture da professionisti. Se la fattura contiene i campi standard (data, numero, fornitore, importi), l'estrazione è automatica. In caso di fatture particolari, il sistema ti avviserà.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Posso cancellare quando voglio?
+          <span class="arrow">&#x25BC;</span>
+        </div>
+        <div class="faq-a">Certo. Non c'è alcun vincolo. Puoi passare a un piano gratuito, mettere in pausa o cancellare il tuo account in qualsiasi momento dalle impostazioni. Non facciamo storie.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Serve carta di credito per provare?
+          <span class="arrow">&#x25BC;</span>
+        </div>
+        <div class="faq-a">No. Il piano Free include 5 fatture al mese senza bisogno di inserire carta di credito. Ti basta un'email per iniziare. È solo quando decidi di passare a Base o Pro che ti verrà chiesto il metodo di pagamento.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p>&copy; 2026 FatturaLens &mdash; <a href="mailto:supporto@fatturalens.replit.app">supporto@fatturalens.replit.app</a></p>
+  </div>
+</footer>
+
+<script>
+// Intersection Observer for fade-in animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('show');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+// FAQ accordion
+function toggleFaq(el) {
+  const item = el.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.faq-item.open').forEach(e => e.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+</script>
+
+</body>
+</html>

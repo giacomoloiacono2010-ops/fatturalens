@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FatturaLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:#0a0a0a;color:#f5f2eb;font-family:'DM Mono',monospace;min-height:100vh;padding:1rem;display:flex;flex-direction:column;align-items:center}
+h1,h2,h3,h4{font-family:Syne,sans-serif;font-weight:700;color:#f5f2eb}
+a{color:#c8ff00;text-decoration:none}
+a:hover{text-decoration:underline}
+.container{width:100%;max-width:600px;padding:1.5rem 1rem;margin:0 auto}
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem}
+.header-brand{display:flex;align-items:center;gap:.5rem}
+.header-brand h1{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#f5f2eb,#c8ff00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.badge{font-size:.65rem;padding:.2rem .6rem;border-radius:999px;font-family:Syne,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.badge-free{background:#1a1a1a;color:#f5f2eb;border:1px solid #333}
+.badge-base{background:#c8ff00;color:#0a0a0a}
+.badge-pro{background:#f5f2eb;color:#0a0a0a}
+.counter{font-size:.75rem;color:#888}
+/* CARDS */
+.card{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.card-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#666;margin-bottom:.5rem}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.5rem;border-radius:8px;font-family:Syne,sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;border:none;transition:all .15s ease;text-decoration:none}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn-primary{background:#c8ff00;color:#0a0a0a}
+.btn-primary:hover{background:#b8ee00;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:#f5f2eb;border:1px solid #333}
+.btn-outline:hover{background:#1a1a1a}
+.btn-download{background:transparent;color:#c8ff00;border:1px solid #c8ff00;padding:.4rem 1rem;font-size:.75rem}
+.btn-download:hover{background:#c8ff00;color:#0a0a0a}
+.btn-link{background:transparent;color:#c8ff00;padding:0;font-family:'DM Mono',monospace;font-size:.85rem;text-decoration:underline}
+/* INPUTS */
+.input{width:100%;padding:.75rem 1rem;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#f5f2eb;font-family:'DM Mono',monospace;font-size:.85rem;outline:none;transition:border .15s}
+.input:focus{border-color:#c8ff00}
+.input::placeholder{color:#555}
+/* DROP ZONE */
+.dropzone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;min-height:200px;border:2px dashed #333;border-radius:12px;padding:2rem;cursor:pointer;transition:all .2s;text-align:center}
+.dropzone.active,.dropzone.dragover{border-color:#c8ff00;background:#1a1a1a}
+.dropzone-icon{font-size:2.5rem;line-height:1;color:#c8ff00;opacity:.6}
+.dropzone-text{color:#888;font-size:.85rem;max-width:260px}
+.dropzone-text strong{color:#c8ff00;font-weight:400}
+/* SPINNER */
+.spinner{display:none;flex-direction:column;align-items:center;gap:1rem;padding:2rem}
+.spinner.show{display:flex}
+.spinner-ring{width:36px;height:36px;border:3px solid #1a1a1a;border-top-color:#c8ff00;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-text{color:#888;font-size:.8rem}
+/* TABLE */
+.table-wrap{overflow-x:auto;margin-top:1rem}
+table{width:100%;border-collapse:collapse;font-size:.75rem}
+th{text-align:left;padding:.6rem .4rem;color:#888;font-family:Syne,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.65rem;border-bottom:1px solid #1a1a1a}
+td{padding:.6rem .4rem;border-bottom:1px solid #1a1a1a;white-space:nowrap}
+td:last-child,th:last-child{text-align:right}
+td .amount{font-family:'DM Mono',monospace;color:#c8ff00}
+/* ALERTS */
+.alert{padding:.9rem 1rem;border-radius:8px;font-size:.8rem;display:none;margin-bottom:1rem}
+.alert.show{display:block}
+.alert-success{background:#0f2e00;border:1px solid #c8ff00;color:#c8ff00}
+.alert-error{background:#2e0000;border:1px solid #ff4444;color:#ff6b6b}
+.alert-warning{background:#2e1f00;border:1px solid #ffa500;color:#ffa500}
+.alert-info{background:#0a1a2e;border:1px solid #4488ff;color:#88bbff}
+/* SECTIONS */
+.section{display:none}
+.section.show{display:block}
+/* STORICO */
+.storico-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.6rem 0;border-bottom:1px solid #141414;font-size:.75rem}
+.storico-item:last-child{border-bottom:none}
+.storico-file{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aaa}
+.storico-date{color:#555;font-size:.65rem;white-space:nowrap}
+.storico-status{font-size:.8rem}
+.status-ok{color:#c8ff00}
+.status-err{color:#ff4444}
+/* BANNER */
+.banner-fixed{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #1a1a1a;padding:.8rem 1rem;z-index:100;display:none}
+.banner-fixed.show{display:block}
+.banner-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.banner-text{font-size:.75rem;color:#888}
+.banner-text strong{color:#f5f2eb}
+/* RESULT CARD */
+.result-card{display:none}
+.result-card.show{display:block}
+.result-actions{display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap}
+/* UTILITY */
+.mt-1{margin-top:1rem}
+.mt-2{margin-top:2rem}
+.mb-1{margin-bottom:1rem}
+.text-center{text-align:center}
+.text-muted{color:#555;font-size:.7rem}
+.flex{display:flex}
+.gap-1{gap:1rem}
+.hidden{display:none!important}
+/* RESPONSIVE */
+@media(max-width:480px){
+.container{padding:1rem .75rem}
+.header-brand h1{font-size:1.2rem}
+.card{padding:1rem}
+.dropzone{min-height:160px;padding:1.5rem}
+.btn{font-size:.8rem;padding:.6rem 1.2rem}
+table{font-size:.7rem}
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-brand">
+      <h1>FatturaLens</h1>
+    </div>
+    <div id="headerInfo" style="display:none;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+      <span id="userEmail" style="font-size:.7rem;color:#666"></span>
+      <span id="userBadge" class="badge"></span>
+      <span id="userCounter" class="counter"></span>
+    </div>
+  </header>
+
+  <!-- SECTION: LOGIN -->
+  <div id="sectionLogin" class="section show">
+    <div class="card">
+      <h2 style="font-size:1.2rem;margin-bottom:.5rem">Accedi o Registrati</h2>
+      <p class="text-muted mb-1">Inserisci la tua email per ricevere un link magico.</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <input id="loginEmail" class="input" type="email" placeholder="tua@email.it" style="flex:1;min-width:180px">
+        <button id="loginBtn" class="btn btn-primary" onclick="login()">Accedi / Registrati</button>
+      </div>
+      <div id="loginAlert" class="alert mt-1"></div>
+    </div>
+    <div class="card text-center" style="padding:1rem">
+      <p class="text-muted" style="font-size:.7rem">Piano Free: 5 fatture/mese &middot; Base: 100 fatture/mese &middot; Pro: illimitate</p>
+    </div>
+  </div>
+
+  <!-- SECTION: DASHBOARD -->
+  <div id="sectionDashboard" class="section">
+
+    <!-- UPLOAD -->
+    <div class="card">
+      <div class="card-label">Carica fattura</div>
+      <div id="dropzone" class="dropzone" onclick="document.getElementById('fileInput').click()">
+        <div class="dropzone-icon">&#x2191;</div>
+        <div class="dropzone-text">Trascina qui il PDF <strong>o clicca per selezionare</strong></div>
+      </div>
+      <input id="fileInput" type="file" accept=".pdf" style="display:none" onchange="handleFileSelect(event)">
+
+      <!-- SPINNER -->
+      <div id="spinner" class="spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-text">Estrazione dati in corso...</div>
+      </div>
+
+      <!-- ALERTS -->
+      <div id="uploadAlert" class="alert"></div>
+
+      <!-- RESULT -->
+      <div id="resultCard" class="card result-card mt-1" style="margin-bottom:0">
+        <div class="card-label">Anteprima fattura</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Data</th><th>Numero</th><th>Fornitore</th><th>P.IVA</th><th>Imponibile</th><th>IVA</th><th>Totale</th>
+            </tr></thead>
+            <tbody id="resultBody"></tbody>
+          </table>
+        </div>
+        <div class="result-actions">
+          <a id="downloadBtn" class="btn btn-download" href="#" download>Scarica Excel</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORICO -->
+    <div class="card">
+      <div class="card-label">Storico ultimi upload</div>
+      <div id="storicoList">
+        <p class="text-muted" style="font-size:.75rem">Carica la prima fattura per vedere lo storico.</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- BANNER FISSO PAGAMENTO -->
+<div id="paymentBanner" class="banner-fixed">
+  <div class="banner-inner">
+    <span class="banner-text">Hai usato <strong id="bannerCount">0/5</strong> fatture gratuite. <strong>Passa a Base o Pro</strong></span>
+    <a id="stripeLink" class="btn btn-primary" href="#" target="_blank" style="font-size:.75rem;padding:.5rem 1.2rem">Scegli piano</a>
+  </div>
+</div>
+
+<script>
+// ============ CONFIG ============
+const API_URL = window.location.origin;
+let TOKEN = '';
+let USER = null;
+
+// ============ INIT ============
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  TOKEN = params.get('token') || localStorage.getItem('fatturalens_token') || '';
+
+  if (TOKEN) {
+    localStorage.setItem('fatturalens_token', TOKEN);
+    loadDashboard();
+  }
+});
+
+// ============ LOGIN ============
+async function login() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) return;
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Invio...';
+
+  const alert = document.getElementById('loginAlert');
+  alert.className = 'alert';
+  alert.textContent = '';
+  alert.classList.remove('show');
+
+  try {
+    const res = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert.className = 'alert alert-success show';
+      alert.textContent = 'Controlla la tua email per il link magico.';
+      document.getElementById('loginEmail').value = '';
+    } else {
+      alert.className = 'alert alert-error show';
+      alert.textContent = data.error || 'Errore durante il login.';
+    }
+  } catch(e) {
+    alert.className = 'alert alert-error show';
+    alert.textContent = 'Errore di connessione al server.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Accedi / Registrati';
+  }
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard() {
+  const alert = document.getElementById('loginAlert');
+  alert.className = 'alert';
+  alert.textContent = '';
+  alert.classList.remove('show');
+
+  try {
+    const res = await fetch(`${API_URL}/dashboard?token=${TOKEN}`);
+    const data = await res.json();
+
+    if (!data.success) {
+      localStorage.removeItem('fatturalens_token');
+      showLogin();
+      return;
+    }
+
+    USER = data.user;
+
+    // Switch sections
+    document.getElementById('sectionLogin').classList.remove('show');
+    document.getElementById('sectionDashboard').classList.add('show');
+
+    // Header info
+    document.getElementById('userEmail').textContent = USER.email;
+    const badge = document.getElementById('userBadge');
+    badge.textContent = USER.piano.toUpperCase();
+    badge.className = 'badge badge-' + USER.piano;
+
+    document.getElementById('userCounter').textContent =
+      `${USER.fatture_processate_mese}/${USER.limite_mensile} fatture questo mese`;
+
+    // Payment banner
+    if (USER.piano === 'free') {
+      document.getElementById('bannerCount').textContent =
+        `${USER.fatture_processate_mese}/${USER.limite_mensile}`;
+      document.getElementById('paymentBanner').classList.add('show');
+    }
+
+    // Storico
+    renderStorico(data.storico || []);
+
+  } catch(e) {
+    localStorage.removeItem('fatturalens_token');
+    showLogin();
+  }
+}
+
+function showLogin() {
+  document.getElementById('sectionDashboard').classList.remove('show');
+  document.getElementById('sectionLogin').classList.add('show');
+}
+
+// ============ UPLOAD ============
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) uploadFile(file);
+}
+
+// Drag & Drop
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => { dropzone.classList.remove('dragover'); });
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') {
+    uploadFile(file);
+  }
+});
+// Also handle paste
+document.addEventListener('paste', (e) => {
+  const file = e.clipboardData.files[0];
+  if (file && file.type === 'application/pdf' && document.getElementById('sectionDashboard').classList.contains('show')) {
+    uploadFile(file);
+  }
+});
+
+async function uploadFile(file) {
+  // Reset UI
+  const alert = document.getElementById('uploadAlert');
+  alert.className = 'alert';
+  alert.textContent = '';
+  alert.classList.remove('show');
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('spinner').classList.add('show');
+  dropzone.style.display = 'none';
+  document.getElementById('fileInput').value = '';
+
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('email', USER.email);
+
+    const res = await fetch(`${API_URL}/upload`, {
+      method: 'POST',
+      body: fd
+    });
+
+    const data = await res.json();
+
+    if (res.status === 403) {
+      // Limite esaurito
+      alert.className = 'alert alert-error show';
+      alert.innerHTML = 'Hai esaurito le fatture del piano Free. Passa a Base (29€) o Pro (49€).';
+      return;
+    }
+
+    if (res.status === 422 || !data.success) {
+      alert.className = 'alert alert-error show';
+      alert.innerHTML = 'Impossibile leggere questa fattura. Riprova o contatta supporto.';
+      return;
+    }
+
+    if (!data.success) {
+      alert.className = 'alert alert-error show';
+      alert.textContent = data.error || 'Errore durante l\'elaborazione.';
+      return;
+    }
+
+    // Success — show preview
+    document.getElementById('resultCard').classList.add('show');
+    const tbody = document.getElementById('resultBody');
+    const r = data.data;
+    tbody.innerHTML = `<tr>
+      <td>${r.Data || ''}</td>
+      <td>${r.Numero || ''}</td>
+      <td>${r.Fornitore || ''}</td>
+      <td>${r['P.IVA'] || ''}</td>
+      <td><span class="amount">${fmtEuro(r.Imponibile)}</span></td>
+      <td><span class="amount">${fmtEuro(r.IVA)}</span></td>
+      <td><span class="amount">${fmtEuro(r.Totale)}</span></td>
+    </tr>`;
+
+    const dlBtn = document.getElementById('downloadBtn');
+    dlBtn.href = `${API_URL}${data.excel_url}`;
+
+    // Refresh dashboard counters
+    await loadDashboard();
+
+  } catch(e) {
+    alert.className = 'alert alert-error show';
+    alert.textContent = 'Errore di connessione al server.';
+  } finally {
+    document.getElementById('spinner').classList.remove('show');
+    dropzone.style.display = 'flex';
+  }
+}
+
+// ============ STORICO ============
+function renderStorico(list) {
+  const el = document.getElementById('storicoList');
+  if (!list.length) {
+    el.innerHTML = '<p class="text-muted" style="font-size:.75rem">Carica la prima fattura per vedere lo storico.</p>';
+    return;
+  }
+  let html = '';
+  list.slice(0,10).forEach(item => {
+    const ok = item.status === 'done';
+    let data = '';
+    try {
+      const j = JSON.parse(item.data);
+      data = j.data_emissione || '';
+    } catch(e) {}
+
+    const file = item.file || 'fattura.pdf';
+    const date = item.created_at ? item.created_at.slice(0,10) : '';
+    html += `<div class="storico-item">
+      <span class="storico-file" title="${file}">${file}</span>
+      <span class="storico-date">${data || date}</span>
+      <span class="storico-status ${ok ? 'status-ok' : 'status-err'}">${ok ? '&#10003;' : '&#10007;'}</span>
+      ${ok ? `<a href="${API_URL}/download/${item.id}" class="btn btn-download" style="padding:.3rem .6rem;font-size:.65rem" download>Scarica</a>` : ''}
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ============ UTILS ============
+function fmtEuro(n) {
+  if (n === null || n === undefined || n === '') return '—';
+  const num = parseFloat(n);
+  if (isNaN(num)) return '—';
+  return '€ ' + num.toFixed(2).replace('.', ',');
+}
+</script>
+
+</body>
+</html>
