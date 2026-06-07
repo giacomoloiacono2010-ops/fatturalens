@@ -9,112 +9,119 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,-apple-system,sans-serif;background:#f8f9fa;color:#1a1a2e;min-height:100vh;padding-top:64px}
-a{color:#2563eb;text-decoration:none;font-weight:500}
-a:hover{text-decoration:underline}
+html{scroll-behavior:smooth}
+body{font-family:Inter,-apple-system,sans-serif;background:#f0f2f5;color:#111827;min-height:100vh;padding-top:64px;display:flex;flex-direction:column}
+a{color:#1d4ed8;text-decoration:none;font-weight:500}
+a:hover{color:#1e40af;text-decoration:underline}
 
 /* HEADER */
-.header{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100}
-.header-left{display:flex;align-items:center;gap:32px}
-.header-logo{font-size:18px;font-weight:600;color:#1a1a2e;letter-spacing:-0.01em}
-.header-nav{display:flex;gap:20px}
-.header-nav a{font-size:14px;color:#5a6578;font-weight:500;padding:4px 0;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
-.header-nav a:hover{color:#1a1a2e;text-decoration:none}
-.header-nav a.active{color:#1a1a2e;border-bottom-color:#2563eb}
-.header-right{display:flex;align-items:center;gap:12px}
-.badge{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;background:#f3f4f6;color:#5a6578}
-.btn-upgrade{padding:6px 12px;border-radius:6px;font-size:12px;font-weight:500;font-family:Inter;background:#2563eb;color:#fff;border:none;cursor:pointer;transition:background .15s}
-.btn-upgrade:hover{background:#1d4ed8}
+.header{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100}
+.header-l{display:flex;align-items:center;gap:40px}
+.header-brand{line-height:1.2}
+.header-logo{font-size:18px;font-weight:600;color:#111827;letter-spacing:-0.01em}
+.header-sub{font-size:11px;color:#9ca3af;font-weight:500}
+.header-nav{display:flex;align-items:center;height:64px;gap:0}
+.header-nav a{position:relative;display:flex;align-items:center;height:100%;padding:0 8px;margin:0 8px;font-size:14px;font-weight:500;color:#6b7280;transition:color .15s;text-decoration:none}
+.header-nav a:hover{color:#111827;text-decoration:none}
+.header-nav a.active{color:#111827}
+.header-nav a.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:#1d4ed8;border-radius:1px}
+.header-r{display:flex;align-items:center;gap:12px}
+.badge{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;color:#4b5563;background:#f3f4f6;border:1px solid #e5e7eb;white-space:nowrap}
+.btn{padding:7px 15px;border-radius:6px;font-size:13px;font-weight:500;font-family:Inter;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;border:none;text-decoration:none}
+.btn:hover{text-decoration:none}
+.btn-primary{background:#1d4ed8;color:#fff}
+.btn-primary:hover{background:#1e40af}
+.btn-sm{padding:6px 12px;font-size:12px}
 .btn-icon{background:none;border:none;cursor:pointer;padding:6px;border-radius:6px;display:flex;align-items:center;transition:background .15s}
 .btn-icon:hover{background:#f3f4f6}
-.btn-icon svg{width:18px;height:18px;stroke:#5a6578;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+.btn-icon svg{width:20px;height:20px;stroke:#6b7280;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
 .btn-icon:hover svg{stroke:#dc2626}
 
 /* CONTAINER */
-.container{max-width:960px;margin:0 auto;padding:40px 20px}
+.container{flex:1;max-width:900px;margin:0 auto;padding:80px 24px 40px;width:100%}
 
 /* BANNER */
-.banner{display:none;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:16px 20px;margin-bottom:24px;align-items:center;justify-content:space-between;gap:16px}
+.banner{display:none;background:linear-gradient(135deg,#eff6ff 0%,#fff 80%);border:1px solid #bfdbfe;border-radius:12px;padding:20px 24px;margin-bottom:24px;align-items:center;justify-content:space-between;gap:16px}
 .banner.show{display:flex}
-.banner-text{font-size:14px;color:#1e40af;line-height:1.4;flex:1}
-.banner-btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;font-family:Inter;background:#2563eb;color:#fff;border:none;cursor:pointer;white-space:nowrap;transition:background .15s}
-.banner-btn:hover{background:#1d4ed8}
+.banner-text{flex:1}
+.banner-title{font-size:14px;color:#1e40af;font-weight:500}
+.banner-sub{font-size:13px;color:#3b82f6;margin-top:2px}
 
 /* CARD */
-.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:32px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.05);transition:box-shadow .2s}
 .card+.card{margin-top:24px}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.card-title{font-size:20px;font-weight:600;color:#1a1a2e}
-.card-subtitle{font-size:14px;color:#5a6578;margin-bottom:24px;line-height:1.4}
+.card-header{padding:20px 24px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:24px}
+.card-title{font-size:18px;font-weight:600;color:#111827;letter-spacing:-0.01em}
+
+/* SECTION LABEL */
+.s-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
 
 /* DROPZONE */
-.dropzone{position:relative;border:2px dashed #d1d5db;border-radius:8px;padding:48px 24px;background:#f8f9fa;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
-.dropzone:hover,.dropzone.dragover{border-color:#2563eb;background:#eff6ff}
-.dropzone-icon{margin-bottom:8px;display:flex;justify-content:center}
-.dropzone-icon svg{width:32px;height:32px;stroke:#9ca3af;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.dropzone-text{font-size:14px;color:#5a6578;margin-bottom:4px}
-.dropzone-text strong{font-weight:600;color:#1a1a2e}
+.dropzone{position:relative;border:2px dashed #d1d5db;border-radius:10px;padding:48px 24px;background:#f9fafb;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+.dropzone:hover,.dropzone.dragover{border-color:#1d4ed8;background:#eff6ff}
+.dropzone-icon{margin-bottom:12px;display:flex;justify-content:center}
+.dropzone-icon svg{width:40px;height:40px;stroke:#9ca3af;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.dropzone:hover .dropzone-icon svg,.dropzone.dragover .dropzone-icon svg{stroke:#1d4ed8}
+.dropzone-label{font-size:14px;font-weight:500;color:#4b5563;margin-bottom:4px}
 .dropzone-hint{font-size:12px;color:#9ca3af}
 .dropzone input{display:none}
 
 /* SPINNER */
-.spinner{display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 0;gap:12px}
+.spinner{display:none;flex-direction:column;align-items:center;padding:32px 0;gap:12px}
 .spinner.show{display:flex}
-.spinner-ring{width:24px;height:24px;border:3px solid #e5e7eb;border-top-color:#2563eb;border-radius:50%;animation:spin .7s linear infinite}
+.spinner-ring{width:24px;height:24px;border:2px solid #e5e7eb;border-top-color:#1d4ed8;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.spinner-text{font-size:14px;color:#5a6578}
+.spinner-text{font-size:14px;color:#6b7280}
 
 /* RESULT */
 .result{display:none;margin-top:24px}
 .result.show{display:block}
-.result-actions{display:flex;gap:12px;align-items:center}
-.btn-download{padding:8px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:Inter;background:#2563eb;color:#fff;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .15s}
-.btn-download:hover{background:#1d4ed8;text-decoration:none}
-.btn-download svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 
 /* TABLE */
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:14px}
-thead th{background:#f8f9fa;padding:12px 16px;text-align:left;font-size:12px;font-weight:600;color:#5a6578;text-transform:uppercase;letter-spacing:0.02em;border-bottom:1px solid #e5e7eb;white-space:nowrap}
-tbody td{padding:12px 16px;border-bottom:1px solid #f3f4f6;color:#1a1a2e;white-space:nowrap}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:600px}
+thead th{background:#f9fafb;padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+tbody td{padding:14px 16px;border-bottom:1px solid #f3f4f6;color:#111827;white-space:nowrap}
 tbody tr:last-child td{border-bottom:none}
-.text-total{font-weight:600}
-.text-muted{color:#5a6578}
-.text-sm{font-size:13px}
+tbody tr:hover{background:#f9fafb}
+.t-total{font-weight:600}
+.t-mono{font-feature-settings:"tnum";font-variant-numeric:tabular-nums}
 
 /* STATUS BADGES */
-.status{padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;display:inline-block}
-.status-ok{background:#ecfdf5;color:#059669}
-.status-err{background:#fef2f2;color:#dc2626}
+.st-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;line-height:1.4}
+.st-ok{background:#ecfdf5;color:#059669}
+.st-err{background:#fef2f2;color:#dc2626}
 
 /* ERROR BOX */
-.error-box{display:none;border-left:3px solid #dc2626;background:#fef2f2;padding:16px;border-radius:6px;margin-top:16px}
-.error-box.show{display:block}
-.error-box-title{font-size:14px;font-weight:600;color:#991b1b;margin-bottom:4px}
-.error-box-text{font-size:13px;color:#dc2626;line-height:1.4}
+.err-box{display:none;border-left:4px solid #dc2626;background:#fef2f2;padding:20px;border-radius:8px;margin-top:16px}
+.err-box.show{display:block}
+.err-box-title{font-size:14px;font-weight:600;color:#991b1b;margin-bottom:4px}
+.err-box-text{font-size:13px;color:#dc2626;line-height:1.5}
 
 /* SECTION */
 .section{margin-top:40px}
-.section-title{font-size:20px;font-weight:600;color:#1a1a2e;margin-bottom:16px}
+.section-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 
 /* EMPTY STATE */
-.empty-state{text-align:center;padding:40px 16px;color:#9ca3af;font-size:14px}
-
-/* HIDDEN FIELDS */
-.hidden{display:none}
+.empty{padding:48px 24px;text-align:center}
+.empty-icon{margin-bottom:12px;display:flex;justify-content:center}
+.empty-icon svg{width:40px;height:40px;stroke:#d1d5db;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.empty-title{font-size:16px;font-weight:500;color:#6b7280;margin-bottom:4px}
+.empty-text{font-size:14px;color:#9ca3af}
 
 /* RESPONSIVE */
 @media(max-width:640px){
-  body{padding-top:56px}
-  .header{padding:0 16px;height:56px}
-  .header-nav{gap:12px}
-  .header-nav a{font-size:13px}
-  .container{padding:24px 16px}
-  .card{padding:20px}
+  .header{padding:0 16px}
+  .header-nav{gap:0}
+  .header-nav a{padding:0 4px;margin:0 4px;font-size:13px}
+  .container{padding:72px 16px 24px}
+  .banner.show{flex-direction:column;align-items:flex-start}
   .dropzone{padding:32px 16px}
-  thead th{padding:10px 12px}
-  tbody td{padding:10px 12px}
-  .banner{flex-direction:column;align-items:flex-start}
+  .card-body{padding:16px}
+  .card-header{padding:16px;flex-direction:column;align-items:flex-start;gap:8px}
+  .btn-sm{font-size:11px;padding:4px 8px}
+  .header-r .badge{display:none}
 }
 </style>
 </head>
@@ -122,16 +129,19 @@ tbody tr:last-child td{border-bottom:none}
 
 <!-- HEADER -->
 <header class="header">
-  <div class="header-left">
-    <span class="header-logo">FatturaLens</span>
+  <div class="header-l">
+    <div class="header-brand">
+      <div class="header-logo">FatturaLens</div>
+      <div class="header-sub">Estrazione dati da fatture PDF</div>
+    </div>
     <nav class="header-nav">
-      <a href="#" class="active" onclick="return false">Dashboard</a>
-      <a href="#" onclick="return false">Storico</a>
+      <a href="/app" class="active">Dashboard</a>
+      <a href="/storico">Storico</a>
     </nav>
   </div>
-  <div class="header-right">
+  <div class="header-r">
     <span class="badge" id="planBadge">Piano Free</span>
-    <button class="btn-upgrade" id="upgradeBtn">Passa a Pro</button>
+    <a href="/prezzi" class="btn btn-primary btn-sm">Passa a Pro</a>
     <button class="btn-icon" onclick="logout()" title="Esci" aria-label="Esci">
       <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     </button>
@@ -142,94 +152,105 @@ tbody tr:last-child td{border-bottom:none}
 
   <!-- BANNER FREE -->
   <div class="banner" id="freeBanner">
-    <span class="banner-text" id="bannerText">Hai usato 2 delle 5 fatture gratuite. Passa a Base per 100 fatture al mese.</span>
-    <button class="banner-btn">Vedi prezzi</button>
+    <div class="banner-text">
+      <div class="banner-title" id="bannerTitle">Hai usato 2 delle 5 fatture gratuite.</div>
+      <div class="banner-sub" id="bannerSub">Passa a Base per elaborarne 100 al mese.</div>
+    </div>
+    <a href="/prezzi" class="btn btn-primary btn-sm">Vedi prezzi</a>
   </div>
 
   <!-- UPLOAD -->
   <div class="card">
-    <div class="card-title">Carica una fattura</div>
-    <p class="card-subtitle">Trascina il PDF o clicca per selezionare. Accettiamo solo fatture con testo estraibile.</p>
+    <div class="card-body">
+      <div class="s-label">Upload</div>
+      <div class="card-title" style="margin-bottom:4px">Carica una fattura</div>
+      <p style="font-size:14px;color:#6b7280;margin-bottom:24px;line-height:1.5">Trascina il PDF o clicca per selezionare. Accettiamo solo fatture con testo estraibile, massimo 10MB.</p>
 
-    <div class="dropzone" id="dropzone">
-      <div class="dropzone-icon">
-        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      </div>
-      <div class="dropzone-text">Trascina il PDF qui o <strong>clicca per selezionare</strong></div>
-      <div class="dropzone-hint">Massimo 10MB</div>
-      <input type="file" id="fileInput" accept=".pdf" onchange="handleFile(this.files[0])">
-    </div>
-
-    <div class="spinner" id="spinner">
-      <div class="spinner-ring"></div>
-      <div class="spinner-text">Estrazione dati in corso...</div>
-    </div>
-
-    <div class="error-box" id="errorBox">
-      <div class="error-box-title">Impossibile leggere la fattura</div>
-      <div class="error-box-text" id="errorBoxText">Il PDF potrebbe essere una scansione. Carica un PDF con testo selezionabile.</div>
-    </div>
-
-    <!-- RESULT -->
-    <div class="result" id="result">
-      <div class="card-header">
-        <span class="card-title" style="font-size:18px">Dati estratti</span>
-        <div class="result-actions">
-          <a class="btn-download" id="downloadLink" href="#">
-            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Scarica Excel
-          </a>
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
+        <div class="dropzone-label">Clicca o trascina il PDF qui</div>
+        <div class="dropzone-hint">Massimo 10MB &middot; PDF con testo</div>
+        <input type="file" id="fileInput" accept=".pdf" onchange="handleFile(this.files[0])">
       </div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Numero</th>
-              <th>Fornitore</th>
-              <th>P.IVA</th>
-              <th>Imponibile</th>
-              <th>IVA</th>
-              <th>Totale</th>
-            </tr>
-          </thead>
-          <tbody id="resultBody">
-            <tr>
-              <td id="rData">—</td>
-              <td id="rNumero">—</td>
-              <td id="rFornitore">—</td>
-              <td id="rPiva">—</td>
-              <td id="rImponibile">—</td>
-              <td id="rIva">—</td>
-              <td class="text-total" id="rTotale">—</td>
-            </tr>
-          </tbody>
-        </table>
+
+      <div class="spinner" id="spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-text">Estrazione dati in corso...</div>
+      </div>
+
+      <div class="err-box" id="errorBox">
+        <div class="err-box-title">Impossibile leggere la fattura</div>
+        <div class="err-box-text" id="errorBoxText">Il PDF sembra essere una scansione immagine. Carica un PDF con testo selezionabile.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result" id="result">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title" style="font-size:16px">Dati estratti</span>
+        <a class="btn btn-primary btn-sm" id="downloadLink" href="#">Scarica Excel</a>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Numero</th>
+                <th>Fornitore</th>
+                <th>P.IVA</th>
+                <th>Imponibile</th>
+                <th>IVA</th>
+                <th>Totale</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody">
+              <tr>
+                <td id="rData">—</td>
+                <td id="rNumero">—</td>
+                <td id="rFornitore">—</td>
+                <td id="rPiva">—</td>
+                <td class="t-mono" id="rImponibile">—</td>
+                <td class="t-mono" id="rIva">—</td>
+                <td class="t-total t-mono" id="rTotale">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- STORICO -->
   <div class="section">
-    <div class="section-title">Storico fatture</div>
-    <div class="card" style="padding:0">
-      <div class="table-wrap">
+    <div class="section-h">
+      <span class="card-title" style="font-size:18px">Storico fatture</span>
+      <a href="/storico" style="font-size:14px;font-weight:500">Vedi tutto</a>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="table-scroll">
         <table>
           <thead>
             <tr>
               <th>Data caricamento</th>
               <th>Nome file</th>
               <th>Stato</th>
-              <th></th>
+              <th>Azione</th>
             </tr>
           </thead>
-          <tbody id="storicoBody">
-          </tbody>
+          <tbody id="storicoBody"></tbody>
         </table>
       </div>
-      <div class="empty-state" id="emptyStorico">
-        <p>Nessuna fattura caricata.</p>
+      <div class="empty" id="emptyStorico">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        </div>
+        <div class="empty-title">Nessuna fattura caricata</div>
+        <div class="empty-text">Carica il tuo primo PDF per iniziare.</div>
       </div>
     </div>
   </div>
@@ -237,11 +258,12 @@ tbody tr:last-child td{border-bottom:none}
 
 <script>
 // ============ STATE ============
-let fattureCount = 0;
-let fattureTotali = 0;
+let TOTAL_COUNT = 0;
+const STORAGE_KEY = 'fatturalens_token';
 
 // ============ DROPZONE ============
 const dz = document.getElementById('dropzone');
+const dzIcon = dz.querySelector('.dropzone-icon svg');
 dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
 dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
 dz.addEventListener('drop', e => {
@@ -256,27 +278,26 @@ dz.addEventListener('click', () => document.getElementById('fileInput').click())
 function handleFile(file) {
   if (!file) return;
   if (file.size > 10 * 1024 * 1024) {
-    showError('Il file supera il limite di 10MB.');
+    showError('Il file supera il limite di 10MB. Carica un PDF pi&ugrave; piccolo.');
     return;
   }
   document.getElementById('spinner').classList.add('show');
   document.getElementById('result').classList.remove('show');
   document.getElementById('errorBox').classList.remove('show');
 
-  // Simulate API call with timeout
   setTimeout(() => {
     document.getElementById('spinner').classList.remove('show');
-    // Random success/failure for demo
-    if (Math.random() > 0.15) {
+    const success = Math.random() > 0.15;
+    if (success) {
       showResult(file.name);
     } else {
-      showError('Il PDF potrebbe essere una scansione. Carica un PDF con testo selezionabile.');
+      showError('Il PDF sembra essere una scansione immagine. Carica un PDF con testo selezionabile.');
     }
   }, 2000);
 }
 
 function showResult(filename) {
-  const data = generateFakeInvoice();
+  const data = genInvoice();
   document.getElementById('rData').textContent = data.data;
   document.getElementById('rNumero').textContent = data.numero;
   document.getElementById('rFornitore').textContent = data.fornitore;
@@ -284,133 +305,106 @@ function showResult(filename) {
   document.getElementById('rImponibile').textContent = data.imponibile;
   document.getElementById('rIva').textContent = data.iva;
   document.getElementById('rTotale').textContent = data.totale;
-  document.getElementById('downloadLink').href = '#';
+  document.getElementById('downloadLink').href = '/download/' + Date.now();
   document.getElementById('result').classList.add('show');
 
-  // Update counters
-  fattureCount++;
-  fattureTotali++;
-  updatePlanBanner();
-
-  // Add to storico
-  addToStorico(filename, 'completed', data.totale);
+  TOTAL_COUNT++;
+  updateBanner();
+  addRow(filename, 'completed', Date.now());
 }
 
 function showError(msg) {
-  document.getElementById('errorBoxText').textContent = msg;
+  document.getElementById('errorBoxText').innerHTML = msg;
   document.getElementById('errorBox').classList.add('show');
-  addToStorico('errore.pdf', 'error', null);
+  addRow('errore.pdf', 'error', null);
 }
 
-// ============ GENERATE FAKE ============
-function generateFakeInvoice() {
-  const fornitori = [
-    {nome:'Studio Tecnico SRL', piva:'01234567890'},
-    {nome:'Servizi Digitali SpA', piva:'09876543210'},
-    {nome:'Consulenze & Partner', piva:'02345678901'},
-    {nome:'Innovazione Italia Srl', piva:'03456789012'},
-    {nome:'SysData SRL', piva:'04567890123'}
+// ============ FAKE DATA ============
+function genInvoice() {
+  const f = [
+    {n:'Studio Tecnico SRL', p:'01234567890'},
+    {n:'Servizi Digitali SpA', p:'09876543210'},
+    {n:'Consulenze & Partner', p:'02345678901'},
+    {n:'SysData SRL', p:'04567890123'},
+    {n:'Architettura+ Srl', p:'03456789012'}
   ];
-  const f = fornitori[Math.floor(Math.random() * fornitori.length)];
-  const imp = Math.round((Math.random() * 4900 + 100) * 100) / 100;
-  const iva = Math.round(imp * 0.22 * 100) / 100;
-  const tot = Math.round((imp + iva) * 100) / 100;
+  const s = f[Math.floor(Math.random()*f.length)];
+  const imp = Math.round((Math.random()*4900+100)*100)/100;
+  const iva = Math.round(imp*0.22*100)/100;
+  const tot = Math.round((imp+iva)*100)/100;
   const d = new Date();
-  d.setDate(d.getDate() - Math.floor(Math.random() * 60));
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const yyyy = d.getFullYear();
+  d.setDate(d.getDate()-Math.floor(Math.random()*60));
   return {
-    data: dd+'/'+mm+'/'+yyyy,
-    numero: 'FT-' + String(Math.floor(Math.random() * 9000 + 1000)),
-    fornitore: f.nome,
-    piva: f.piva,
-    imponibile: '€ ' + imp.toFixed(2).replace('.',','),
-    iva: '€ ' + iva.toFixed(2).replace('.',','),
-    totale: '€ ' + tot.toFixed(2).replace('.',',')
+    data: d.toLocaleDateString('it-IT'),
+    numero: 'FT/'+String(Math.floor(Math.random()*9000+1000)),
+    fornitore: s.n,
+    piva: s.p,
+    imponibile: '€ '+imp.toFixed(2).replace('.',','),
+    iva: '€ '+iva.toFixed(2).replace('.',','),
+    totale: '€ '+tot.toFixed(2).replace('.',',')
   };
 }
 
 // ============ STORICO ============
-function addToStorico(filename, status, totale) {
+function addRow(filename, status, ts) {
   const tbody = document.getElementById('storicoBody');
-  const empty = document.getElementById('emptyStorico');
-  empty.style.display = 'none';
-
-  const now = new Date();
-  const dd = String(now.getDate()).padStart(2,'0');
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const yyyy = now.getFullYear();
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mi = String(now.getMinutes()).padStart(2,'0');
-  const dataStr = dd+'/'+mm+'/'+yyyy+' '+hh+':'+mi;
-
+  document.getElementById('emptyStorico').style.display = 'none';
+  const now = ts ? new Date(ts) : new Date();
+  const label = status === 'completed' ? 'Completato' : 'Errore';
+  const cls = status === 'completed' ? 'st-ok' : 'st-err';
+  const dl = status === 'completed' ? '<a href="/download/'+ts+'" style="font-size:14px;font-weight:500;color:#1d4ed8" class="dl-link">Scarica</a>' :
+    '<span style="font-size:13px;color:#9ca3af">—</span>';
   const tr = document.createElement('tr');
-  const statusClass = status === 'completed' ? 'status-ok' : 'status-err';
-  const statusLabel = status === 'completed' ? 'Completato' : 'Errore';
-  let downloadCell = '';
-  if (status === 'completed') {
-    downloadCell = '<a href="#" class="text-sm" style="color:#2563eb">Scarica</a>';
-  }
-
   tr.innerHTML =
-    '<td class="text-muted text-sm">'+dataStr+'</td>' +
-    '<td class="text-sm" style="max-width:200px;overflow:hidden;text-overflow:ellipsis">'+filename+'</td>' +
-    '<td><span class="status '+statusClass+'">'+statusLabel+'</span></td>' +
-    '<td>'+downloadCell+'</td>';
-
+    '<td style="color:#4b5563;font-size:13px">'+now.toLocaleDateString('it-IT')+' '+now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})+'</td>' +
+    '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:#111827">'+filename+'</td>' +
+    '<td><span class="st-badge '+cls+'">'+label+'</span></td>' +
+    '<td>'+dl+'</td>';
   tbody.insertBefore(tr, tbody.firstChild);
-
-  // Keep max 20
-  while (tbody.children.length > 20) {
-    tbody.removeChild(tbody.lastChild);
-  }
+  while (tbody.children.length > 20) tbody.removeChild(tbody.lastChild);
 }
 
-// ============ PLAN BANNER ============
-function updatePlanBanner() {
-  const banner = document.getElementById('freeBanner');
+// ============ BANNER ============
+function updateBanner() {
+  const b = document.getElementById('freeBanner');
   const max = 5;
-  const used = fattureTotali;
-  if (used >= max) {
-    banner.classList.add('show');
-    document.getElementById('bannerText').textContent =
-      'Hai raggiunto il limite di '+max+' fatture gratuite. Passa a Base o Pro per continuare.';
-    return;
-  }
-  if (used > 0) {
-    banner.classList.add('show');
-    document.getElementById('bannerText').textContent =
-      'Hai usato '+used+' delle '+max+' fatture gratuite. Passa a Base per 100 fatture al mese.';
+  if (TOTAL_COUNT >= max) {
+    b.classList.add('show');
+    document.getElementById('bannerTitle').textContent = 'Hai raggiunto il limite di '+max+' fatture gratuite.';
+    document.getElementById('bannerSub').textContent = 'Passa a Base o Pro per continuare a elaborare fatture.';
+  } else if (TOTAL_COUNT > 0) {
+    b.classList.add('show');
+    document.getElementById('bannerTitle').textContent = 'Hai usato '+TOTAL_COUNT+' delle '+max+' fatture gratuite.';
+    document.getElementById('bannerSub').textContent = 'Passa a Base per elaborarne 100 al mese.';
   }
 }
 
 // ============ LOGOUT ============
 function logout() {
-  localStorage.removeItem('fatturalens_token');
+  localStorage.removeItem(STORAGE_KEY);
   window.location.href = '/';
 }
 
 // ============ INIT ============
-// Pre-populate with 3 sample entries for a realistic demo
 (function init() {
-  const nomi = ['fattura_2026_05.pdf', 'Fattura_2026_04_15.pdf', 'FT_2026_06_01_Acme.pdf'];
-  const tot = ['€ 1.250,00', '€ 3.480,50', '€ 890,32'];
-  nomi.forEach((n,i) => {
-    const tbody = document.getElementById('storicoBody');
-    const empty = document.getElementById('emptyStorico');
-    empty.style.display = 'none';
-    const data = ['12/05/2026 14:23','28/04/2026 09:41','01/06/2026 16:05'];
+  const demo = [
+    {f:'fattura_2026_05.pdf',d:'12/05/2026 14:23',t:1650000000000+1},
+    {f:'Fattura_Aprile.pdf',d:'28/04/2026 09:41',t:1650000000000+2},
+    {f:'FT_Acme_2026.pdf',d:'01/06/2026 16:05',t:1650000000000+3}
+  ];
+  const tb = document.getElementById('storicoBody');
+  document.getElementById('emptyStorico').style.display = 'none';
+  demo.forEach((x,i) => {
     const tr = document.createElement('tr');
     tr.innerHTML =
-      '<td class="text-muted text-sm">'+data[i]+'</td>' +
-      '<td class="text-sm" style="max-width:200px;overflow:hidden;text-overflow:ellipsis">'+n+'</td>' +
-      '<td><span class="status status-ok">Completato</span></td>' +
-      '<td><a href="#" class="text-sm" style="color:#2563eb">Scarica</a></td>';
-    tbody.appendChild(tr);
+      '<td style="color:#4b5563;font-size:13px">'+x.d+'</td>' +
+      '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:#111827">'+x.f+'</td>' +
+      '<td><span class="st-badge st-ok">Completato</span></td>' +
+      '<td><a href="/download/'+x.t+'" style="font-size:14px;font-weight:500;color:#1d4ed8" class="dl-link">Scarica</a></td>';
+    tb.appendChild(tr);
   });
-  fattureTotali = 2;
-  updatePlanBanner();
+  TOTAL_COUNT = 2;
+  updateBanner();
 })();
 </script>
 </body>
