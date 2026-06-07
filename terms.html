@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termini di Servizio — FatturaLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,-apple-system,sans-serif;background:#f8f9fa;color:#1a1a2e;padding-top:64px}
+a{color:#2563eb;text-decoration:none;font-weight:500}
+a:hover{text-decoration:underline}
+
+/* HEADER */
+.header{position:fixed;top:0;left:0;right:0;height:64px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100}
+.header-logo{font-size:18px;font-weight:600;color:#1a1a2e;letter-spacing:-0.01em}
+.header-right a{font-size:14px;font-weight:500}
+
+/* CONTENT */
+.content{max-width:720px;margin:0 auto;padding:60px 20px}
+h1{font-size:36px;font-weight:600;color:#1a1a2e;margin-bottom:6px}
+.updated{font-size:14px;color:#9ca3af;margin-bottom:48px}
+h2{font-size:20px;font-weight:600;color:#1a1a2e;margin-top:40px;margin-bottom:12px}
+p{font-size:16px;line-height:1.7;color:#5a6578;margin-bottom:16px}
+ul{margin:0 0 16px 20px;font-size:16px;line-height:1.7;color:#5a6578}
+li{margin-bottom:4px}
+strong{color:#1a1a2e}
+
+/* FOOTER */
+.footer{text-align:center;padding:24px 20px;font-size:14px;color:#9ca3af}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <span class="header-logo">FatturaLens</span>
+  <div class="header-right">
+    <a href="/">Torna al sito</a>
+  </div>
+</header>
+
+<div class="content">
+  <h1>Termini di Servizio</h1>
+  <p class="updated">Ultimo aggiornamento: 7 giugno 2026</p>
+
+  <h2>1. Definizioni</h2>
+  <p>Ai fini del presente contratto si intende per:</p>
+  <ul>
+    <li><strong>FatturaLens</strong>: il servizio SaaS di estrazione dati da fatture PDF, gestito da FatturaLens con sede operativa in Italia.</li>
+    <li><strong>Utente</strong>: qualsiasi persona fisica o giuridica che si registra al servizio e accetta i presenti termini.</li>
+    <li><strong>Servizio</strong>: l&rsquo;insieme delle funzionalit&agrave; offerte tramite la piattaforma web accessibile all&rsquo;indirizzo fatturalens.onrender.com.</li>
+    <li><strong>Dati estratti</strong>: le informazioni contenute nelle fatture PDF caricate dall&rsquo;utente, elaborate automaticamente dal sistema.</li>
+  </ul>
+
+  <h2>2. Oggetto del servizio</h2>
+  <p>FatturaLens fornisce un servizio di estrazione automatica dei dati contenuti in fatture in formato PDF tramite intelligenza artificiale. Il servizio consente all&rsquo;utente di caricare un file PDF, ottenere i dati strutturati in formato tabellare e scaricare un file Excel pronto per l&rsquo;importazione in software contabili di terze parti.</p>
+  <p>Il servizio &egrave; accessibile esclusivamente tramite browser web. Non &egrave; richiesta alcuna installazione di software locale.</p>
+
+  <h2>3. Registrazione e account</h2>
+  <p>Per utilizzare il servizio &egrave; necessario registrarsi fornendo nome dello studio o ragione sociale e un indirizzo email professionale valido. L&rsquo;utente &egrave; responsabile della riservatezza delle proprie credenziali di accesso e di tutte le attivit&agrave; effettuate tramite il proprio account.</p>
+  <p>L&rsquo;utente dichiara di essere maggiorenne e di avere la capacit&agrave; giuridica necessaria per stipulare il presente contratto. Nel caso di registrazione per conto di una persona giuridica, l&rsquo;utente dichiara di essere autorizzato a rappresentarla.</p>
+  <p>&Egrave; fatto divieto di creare account multipli per aggirare i limiti del piano gratuito.</p>
+
+  <h2>4. Piani e pagamenti</h2>
+  <p>FatturaLens offre i seguenti piani di abbonamento:</p>
+  <ul>
+    <li><strong>Piano Free</strong>: gratuito, include 5 fatture al mese con funzionalit&agrave; base.</li>
+    <li><strong>Piano Base</strong>: 29&euro;/mese, include 100 fatture al mese, supporto email e storico illimitato.</li>
+    <li><strong>Piano Pro</strong>: 49&euro;/mese, include fatture illimitate, 3 utenti e priorit&agrave; di elaborazione.</li>
+  </ul>
+  <p>I pagamenti sono gestiti esclusivamente tramite Stripe. I dati delle carte di credito non transitano ne vengono memorizzati dai server di FatturaLens. L&rsquo;addebito avviene mensilmente alla data di sottoscrizione.</p>
+  <p>In caso di mancato pagamento, il servizio verr&agrave; sospeso entro 7 giorni dalla scadenza. L&rsquo;account verr&agrave; conservato per 30 giorni prima della cancellazione definitiva.</p>
+
+  <h2>5. Limitazioni del servizio</h2>
+  <p>FatturaLens utilizza l&rsquo;intelligenza artificiale per estrarre i dati dalle fatture. L&rsquo;utente riconosce e accetta che:</p>
+  <ul>
+    <li>Il servizio funziona esclusivamente con fatture in formato PDF contenenti <strong>testo selezionabile</strong>. Le fatture scansionate o immagini PDF senza testo estraibile non sono supportate.</li>
+    <li>La precisione dell&rsquo;estrazione non &egrave; garantita al 100%. &Egrave; responsabilit&agrave; dell&rsquo;utente verificare la correttezza dei dati estratti prima dell&rsquo;utilizzo.</li>
+    <li>FatturaLens non si assume alcuna responsabilit&agrave; per errori, omissioni o danni derivanti dall&rsquo;uso dei dati estratti.</li>
+  </ul>
+
+  <h2>6. Propriet&agrave; intellettuale</h2>
+  <p>La piattaforma FatturaLens, inclusi il codice sorgente, il design, il logo e l&rsquo;interfaccia utente, &egrave; di propriet&agrave; esclusiva di FatturaLens ed &egrave; protetta dalle leggi sul diritto d&rsquo;autore e dalla propriet&agrave; intellettuale.</p>
+  <p>L&rsquo;utente concede a FatturaLens una licenza limitata per elaborare i PDF caricati esclusivamente ai fini dell&rsquo;erogazione del servizio. I dati estratti rimangono di propriet&agrave; dell&rsquo;utente.</p>
+
+  <h2>7. Cancellazione dell&rsquo;account</h2>
+  <p>L&rsquo;utente pu&ograve; richiedere la cancellazione del proprio account in qualsiasi momento scrivendo a <a href="mailto:supporto@fatturalens.it">supporto@fatturalens.it</a>. La cancellazione comporta la rimozione permanente di tutti i dati associati all&rsquo;account, inclusi i file Excel e lo storico delle elaborazioni.</p>
+  <p>FatturaLens si riserva il diritto di sospendere o cancellare account in caso di violazione dei presenti termini, uso fraudolento del servizio o inattivit&agrave; prolungata superiore a 12 mesi.</p>
+
+  <h2>8. Limitazione di responsabilit&agrave;</h2>
+  <p>FatturaLens non sar&agrave; responsabile per danni diretti, indiretti, incidentali o consequenziali derivanti dall&rsquo;uso o dall&rsquo;impossibilit&agrave; di usare il servizio, inclusi a titolo esemplificativo danni per perdita di dati, mancato guadagno o interruzione dell&rsquo;attivit&agrave;.</p>
+  <p>Il servizio viene fornito &ldquo;cos&igrave; com&rsquo;&egrave;&rdquo; e &ldquo;come disponibile&rdquo;, senza garanzie di alcun tipo, esplicite o implicite, inclusa la garanzia di idoneit&agrave; per uno scopo particolare.</p>
+
+  <h2>9. Legge applicabile</h2>
+  <p>I presenti Termini di Servizio sono regolati dalla legge italiana. Per qualsiasi controversia derivante dall&rsquo;interpretazione o esecuzione del presente contratto sar&agrave; competente in via esclusiva il Foro di Genova.</p>
+
+  <h2>10. Contatti</h2>
+  <p>Per qualsiasi domanda, chiarimento o richiesta relativa ai presenti Termini di Servizio, puoi contattarci:</p>
+  <ul>
+    <li>Email: <a href="mailto:supporto@fatturalens.it">supporto@fatturalens.it</a></li>
+  </ul>
+  <p>La versione aggiornata dei Termini di Servizio &egrave; sempre disponibile su questa pagina. Gli utenti saranno informati di modifiche sostanziali tramite comunicazione via email.</p>
+</div>
+
+<footer class="footer">
+  &copy; 2026 FatturaLens
+</footer>
+
+</body>
+</html>
